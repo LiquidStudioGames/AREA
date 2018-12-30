@@ -1,18 +1,25 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Damage : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+
+    public float health = 100f;
+
+    public void DoDamage (string killer, float dmg)
     {
-        
+        Debug.Log(dmg);
+        health -= 15f;
+        if (health <= 0f)
+        {
+            Die(killer);
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    void Die (string killer)
     {
-        
+        Debug.Log(killer + " killed " + transform.name + " with a gun");
+        Destroy(gameObject);
     }
+
 }
