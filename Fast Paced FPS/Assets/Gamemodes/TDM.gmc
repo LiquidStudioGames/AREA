@@ -1,0 +1,14 @@
+Gamemode:
+  -length: 10
+  -start: start
+  -ninjas::
+    -1::
+      -enabled: true
+      -health: 70
+      -damage: 120
+    -2::
+      -enabled: false
+      -health: 100
+      -damage: 100
+  -size: 5
+  -mode: tdm
