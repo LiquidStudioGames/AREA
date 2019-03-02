@@ -8,8 +8,8 @@ public class ModReader : MonoBehaviour
     void Start()
     {
         // Change directory on release
-        DirectoryInfo d = new DirectoryInfo(@"D:\Users\Daniel\Documents\GitHub\fast-paced-fps\Fast Paced FPS\Assets\Gamemodes");//Assuming Test is your Folder
-        FileInfo[] Files = d.GetFiles("*.gmc"); //Getting Text files
+        DirectoryInfo d = new DirectoryInfo(@'D:\Users\Daniel\Documents\GitHub\fast-paced-fps\Fast Paced FPS\Assets\Gamemodes');//Assuming Test is your Folder
+        FileInfo[] Files = d.GetFiles('*.gmc'); //Getting Text files
         foreach (FileInfo file in Files)
         {
             //Debug.Log(file.Name);
@@ -29,10 +29,10 @@ public class ModReader : MonoBehaviour
         //Debug.Log(content);
 
         // Removes the file ending
-        string name = file.Name.Replace(".gmc", "");
+        string name = file.Name.Replace('.gmc', '');
 
         // Runs the method for handling the mods
-        ModLoader.Instance.LoadMod(name, "Gamemode", content);
+        ModLoader.Instance.LoadMod(name, 'Gamemode', content);
     }
 
 }
