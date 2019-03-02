@@ -1,0 +1,11 @@
+[
+
+  'OS' :: 'get OS'
+  'Country' :: 'get Country'
+  'Version' :: 'get Version'
+  'Mods' :: 'get Mods'
+
+  ?isUpdating = False
+  ?isLastOverloaded = False
+
+];
