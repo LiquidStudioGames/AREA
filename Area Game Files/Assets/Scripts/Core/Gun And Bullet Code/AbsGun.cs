@@ -6,7 +6,7 @@ using UnityEngine;
 
 public abstract class AbsGun : MonoBehaviour
 {
-    public GameObject GunBullet; //Bullet that will be shot 
+    public GameObject GunBulletPrefab; //Bullet that will be shot 
 
 
     //Stats for any kind of weapon
@@ -14,9 +14,7 @@ public abstract class AbsGun : MonoBehaviour
     public float ReloadTime; //Unit in seconds
     public int MaxAmmo;
     [HideInInspector] public int CurrentAmmo;
-    
-
-    public bool isAutoFire { get; set; }  //Whether holding fire button will make it fire
+    public bool isAutoFire;  //Whether holding fire button will make it fire
 
     //Internals for firerate control
 
@@ -24,7 +22,7 @@ public abstract class AbsGun : MonoBehaviour
     /// Checks if gun is in cool down and creates an instance of GunBullet
     /// </summary>
     /// <param name="cameraAngle">The angle the player is looking at in vector 3</param>
-    public virtual void Shoot(Vector3 cameraAngle)
+    public virtual void Shoot( Vector3 cameraAngle)
     {
 
     }
