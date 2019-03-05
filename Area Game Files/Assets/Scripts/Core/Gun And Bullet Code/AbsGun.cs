@@ -6,13 +6,14 @@ using UnityEngine;
 
 public abstract class AbsGun : MonoBehaviour
 {
-    public AbsBullet GunBullet; //Bullet that will shoot 
+    public GameObject GunBullet; //Bullet that will be shot 
+
 
     //Stats for any kind of weapon
-    public abstract float FireRate { get; set; }  //Unit in rounds per minute
-    public abstract float ReloadTime { get; set; } //Unit in seconds
-    public abstract int MaxAmmo { get; set; }
-    public abstract int CurrentAmmo { get; set; }
+    public float FireRate;   //Unit in rounds per minute
+    public float ReloadTime; //Unit in seconds
+    public int MaxAmmo;
+    [HideInInspector] public int CurrentAmmo;
     
 
     public bool isAutoFire { get; set; }  //Whether holding fire button will make it fire

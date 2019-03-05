@@ -4,15 +4,6 @@ using UnityEngine;
 
 public abstract class AbsBullet : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    [SerializeField]
+    protected float muzzleVel;
 }

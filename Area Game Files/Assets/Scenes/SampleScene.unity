@@ -621,7 +621,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 238885804}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_GeneratorAsset: {fileID: 0}
   m_Script: {fileID: 11500000, guid: 71fe750f41a6e48419fd0ccc67e8dcf5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
@@ -763,7 +762,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 424916324}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_GeneratorAsset: {fileID: 0}
   m_Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
@@ -1110,7 +1108,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 646315072}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_GeneratorAsset: {fileID: 0}
   m_Script: {fileID: 1301386320, guid: f70555f144d8491a825f0804e09c671c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
@@ -1128,7 +1125,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 646315072}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_GeneratorAsset: {fileID: 0}
   m_Script: {fileID: 1980459831, guid: f70555f144d8491a825f0804e09c671c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
@@ -1225,6 +1221,24 @@ Light:
     m_Bias: 0.05
     m_NormalBias: 0.4
     m_NearPlane: 0.2
+    m_CullingMatrixOverride:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    m_UseCullingMatrixOverride: 0
   m_Cookie: {fileID: 0}
   m_DrawHalo: 0
   m_Flare: {fileID: 0}
@@ -1232,12 +1246,15 @@ Light:
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+  m_RenderingLayerMask: 1
   m_Lightmapping: 1
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
 --- !u!4 &705507995
@@ -1372,7 +1389,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 793012224}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_GeneratorAsset: {fileID: 0}
   m_Script: {fileID: 11500000, guid: 28d1c64246e2a2e42ba27dca7ed595ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
@@ -1399,7 +1415,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 793012224}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_GeneratorAsset: {fileID: 0}
   m_Script: {fileID: 11500000, guid: d6e8569dbbf6754418531f2e8586a350, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
@@ -1451,7 +1466,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 907718587}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_GeneratorAsset: {fileID: 0}
   m_Script: {fileID: -113659843, guid: f70555f144d8491a825f0804e09c671c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
@@ -1778,7 +1792,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 1125140319}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_GeneratorAsset: {fileID: 0}
   m_Script: {fileID: 11500000, guid: 71fe750f41a6e48419fd0ccc67e8dcf5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
@@ -1829,7 +1842,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 1208445533}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_GeneratorAsset: {fileID: 0}
   m_Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
@@ -1871,6 +1883,7 @@ GameObject:
   - component: {fileID: 1367172675}
   - component: {fileID: 1367172674}
   - component: {fileID: 1367172673}
+  - component: {fileID: 1367172676}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1917,7 +1930,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 1367172670}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_GeneratorAsset: {fileID: 0}
   m_Script: {fileID: 11500000, guid: dc9400b2c053caa4daf51691f0766a50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
@@ -1930,7 +1942,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 1367172670}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_GeneratorAsset: {fileID: 0}
   m_Script: {fileID: 11500000, guid: 088f27a104ff6ad4088e71cafe39c371, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
@@ -1950,6 +1961,24 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1367172676
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1367172670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce88692ce14e13149ae0620087da1d04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GunBullet: {fileID: 5030075625322037402, guid: 02d84531a5cdca9459f961ddb1e6f2a0,
+    type: 3}
+  FireRate: 0
+  ReloadTime: 0
+  MaxAmmo: 0
+  CurrentAmmo: 0
 --- !u!1 &1539528559
 GameObject:
   m_ObjectHideFlags: 0
@@ -2021,7 +2050,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 1595398058}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_GeneratorAsset: {fileID: 0}
   m_Script: {fileID: 1077351063, guid: f70555f144d8491a825f0804e09c671c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
@@ -2041,7 +2069,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 1595398058}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_GeneratorAsset: {fileID: 0}
   m_Script: {fileID: -619905303, guid: f70555f144d8491a825f0804e09c671c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
@@ -2143,7 +2170,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 1829607875}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_GeneratorAsset: {fileID: 0}
   m_Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
@@ -2447,7 +2473,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 2020597058}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_GeneratorAsset: {fileID: 0}
   m_Script: {fileID: 11500000, guid: 71fe750f41a6e48419fd0ccc67e8dcf5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
