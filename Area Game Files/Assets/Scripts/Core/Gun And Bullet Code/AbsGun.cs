@@ -15,7 +15,6 @@ public abstract class AbsGun : MonoBehaviour
     public int MaxAmmo;
     [HideInInspector] public int CurrentAmmo;
     public bool isAutoFire;  //Whether holding fire button will make it fire
-
     //Internals for firerate control
 
     /// <summary>
