@@ -8,5 +8,4 @@ public class Character : ScriptableObject
   public int Speed;           // Walk/Run speed
   public int GrenadeReload;   // Time before the character gets his/hers grenade back
   public Sprite Icon;         // Icon for the character
-  public GameObject Model;    // Model for the character
 }
