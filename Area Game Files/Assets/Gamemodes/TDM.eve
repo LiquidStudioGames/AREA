@@ -1,0 +1,27 @@
+[
+
+  @ Defining mod type
+  $Define = 'Gamemode'
+
+  @ Game option variables
+  'Name' :: 'TDM'
+  'Teams' :: 3
+  'TeamSize' :: 5
+  'Length' :: 10
+
+  @ Global ninja variables (Default is 100%, so 70 would be 70% of the original)
+  'JumpHeight' :: 70
+  'WalkSpeed' :: 110
+  'Ammo' :: 90
+  'Health' :: 105
+  'Damage' :: 95
+
+  @ Which characters should be pickable
+  ?Zonya = True
+  ?Eyal = False
+  ?Eqa = True
+
+  @ Makes sure it doesn't quit
+  $Quit = 'off'
+
+];

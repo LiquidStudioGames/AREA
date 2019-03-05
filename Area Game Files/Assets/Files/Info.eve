@@ -1,0 +1,16 @@
+[
+
+  $Define = 'Getter'
+
+  'uptime_' :: 'xxoff'
+  'downtime_' :: 'xxon'
+  'limit_' :: None
+  'tasks_' :: None
+  'addons_' :: None
+  'timer_' :: Off
+
+  ?firstTime = True
+
+  $Quit = 'On_Off'
+
+];

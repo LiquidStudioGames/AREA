@@ -1,5 +1,7 @@
 [
 
+  $Define = 'Getter'
+
   'OS' :: 'get OS'
   'Country' :: 'get Country'
   'Version' :: 'get Version'
