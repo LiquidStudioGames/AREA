@@ -9,7 +9,7 @@ public class KbPlayerInput : MonoBehaviour, IPlayerInput
 
 
     [SerializeField]
-    private ScriptableObject KeyBindings; //Snipped for future keybind change support <Low Prio>
+    private KeyboardLayout KeyBindings; //Snipped for future keybind change support <Low Prio>
 
 
     //Properties for input reading
