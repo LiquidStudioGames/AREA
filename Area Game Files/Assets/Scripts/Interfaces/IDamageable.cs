@@ -5,7 +5,11 @@ using System.Text;
 
     interface IDamageable
     {
-    //Any object that will interact with bullets will implement this interface
+    /// <summary>
+    /// Any object that will interact with bullets will implement this interface
+    /// </summary>
+
+
     void OnHit(int damage);
 
     }
