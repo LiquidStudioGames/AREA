@@ -7,22 +7,25 @@ public class KbPlayerInput : MonoBehaviour, IPlayerInput
 {
 
 
+
+    [SerializeField]
+    private ScriptableObject KeyBindings; //Snipped for future keybind change support <Low Prio>
+
+
     //Properties for input reading
     public bool JumpingPressed { get; private set; }
     public bool JumpingHeld { get; private set; }
     public bool FirePressed { get; private set; }
     public bool FireHeld { get; private set; }
 
+    private Input Reader = new Input();
 
 
-
-
-    // Start is called before the first frame update
-    void Start()
+    // Awake is called when the object is enabled
+    private void awake()
     {
-        
-    }
 
+    }
     // Update is called once per frame
     void Update()
     {
@@ -31,7 +34,7 @@ public class KbPlayerInput : MonoBehaviour, IPlayerInput
 
 
     //Needs working
-    public void ReadInput()
+    public void ReadInput(Input reader)
     {
         throw new NotImplementedException();
     }

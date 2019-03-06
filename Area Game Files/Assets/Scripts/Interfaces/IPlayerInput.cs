@@ -14,9 +14,11 @@ public interface IPlayerInput
 
     bool FirePressed { get; }
     bool FireHeld { get; } //Used when AutoFire is on
+
+
         
 
-    void ReadInput();
+    void ReadInput(Input reader);
 
 
 }
