@@ -18,7 +18,7 @@ public interface IPlayerInput
 
         
 
-    void ReadInput(Input reader);
+    void ReadInput();
 
 
 }
