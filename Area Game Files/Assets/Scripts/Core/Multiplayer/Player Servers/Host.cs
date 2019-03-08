@@ -9,6 +9,7 @@ public class Host : MonoBehaviour
 
     private Client client;
 
+    // Game settings variables
     private byte GameSize = 10;
     private string GameName;
 
