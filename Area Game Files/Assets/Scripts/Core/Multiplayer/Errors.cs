@@ -15,14 +15,14 @@ class Errors : MonoBehaviour
 
     // Gets the status text element
     public Text Status;
-  
-    void Awake ()
+
+    void Awake()
     {
         Instance = this;
     }
 
     // SetErrorStatus Method :: Sets the status text to the error
-    public void SetErrorStatus (string Error)
+    public void SetErrorStatus(string Error)
     {
         Status.text = Error;
     }

@@ -10,4 +10,18 @@ public abstract class AbsBullet : MonoBehaviour
     protected int damage;
 
     protected Vector3 angle;
+    protected Transform position;
+
+
+    public virtual void Awake()
+    {
+
+
+        
+    }
+
+    public virtual void Update()
+    {
+        
+    }
 }
