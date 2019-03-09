@@ -24,7 +24,9 @@ public class KbPlayerInput : MonoBehaviour, IPlayerInput
 
 
 
-    //Needs working
+    /// <summary>
+    /// Fuction that will be called at Update()
+    /// </summary>
     public void ReadInput()
     {
         JumpingPressed = Input.GetKeyDown(KeyBindings.Jump);
@@ -35,20 +37,20 @@ public class KbPlayerInput : MonoBehaviour, IPlayerInput
         Backwards = Input.GetKey(KeyBindings.Backwards);
         Left = Input.GetKey(KeyBindings.StrafeLeft);
         Right = Input.GetKey(KeyBindings.StrafeRight);
-        
+
     }
 
 
     // Awake is called when the object is enabled
-    void Awake()
+    public void Awake()
     {
 
     }
 
 
     // Update is called once per frame
-    void Update()
+    public void Update()
     {
-        
+        ReadInput();
     }
 }
