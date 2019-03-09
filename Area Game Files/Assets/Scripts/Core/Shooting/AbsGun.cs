@@ -22,17 +22,17 @@ public abstract class AbsGun : MonoBehaviour
     /// Checks if gun is in cool down and creates an instance of GunBullet
     /// </summary>
     /// <param name="cameraAngle">The angle the player is looking at in vector 3</param>
-    public virtual void Shoot(Vector3 cameraAngle)
+    public virtual void Shoot (Vector3 cameraAngle)
     {
 
     }
 
 
     // Start is called before the first frame update
-    public virtual void Start() { }
+    public virtual void Start () { }
 
     // Update is called once per frame
-    public virtual void Update(){ }
+    public virtual void Update (){ }
 }
 
 
