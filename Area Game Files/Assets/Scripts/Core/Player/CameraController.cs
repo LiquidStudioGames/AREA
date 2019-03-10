@@ -4,10 +4,13 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+
+    Transform playerObj; 
+
+    //Gets component 
+    void Awake()
     {
-        
+        playerObj = GetComponentInParent<Transform>();
     }
 
     // Update is called once per frame

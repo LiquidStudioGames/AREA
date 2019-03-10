@@ -24,7 +24,7 @@ public abstract class AbsGun : MonoBehaviour
     /// <param name="cameraAngle">The angle the player is looking at in vector 3</param>
     public virtual void Shoot (Vector3 cameraAngle)
     {
-
+        CurrentAmmo--;
     }
 
 

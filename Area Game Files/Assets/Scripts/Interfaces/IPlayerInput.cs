@@ -5,7 +5,7 @@ using UnityEngine;
 public interface IPlayerInput
 {
     /// <summary>
-    /// Interface used to streamline the creation of PlayerInput classes WIP
+    /// Interface used to streamline the creation of PlayerInput classes
     /// </summary>
 
 
