@@ -10,14 +10,14 @@ public class AccountManager : MonoBehaviour
     public static AccountManager Instance;
 
     // Sets the error variable
-    private Errors error;
+    private MenuStatus status;
 
     // Awake Method :: Called at the very start
     void Awake()
     {
 
-        // Makes the error variable to an instance of the Errors script
-        error = Errors.Instance;
+        // Makes the error variable to an instance of the MenuStatus script
+        status = MenuStatus.Instance;
 
         // Checks if this scripts instance exists already
         if (Instance != null)
@@ -118,13 +118,13 @@ public class AccountManager : MonoBehaviour
         if (Result.text == "ContainsUnsupportedSymbol")
         {
             // Sets the status text to the error
-            error.SetErrorStatus("Couldn't upload data to server");
+            status.SetStatus("Couldn't upload data to server");
         }
 
         if (Result.text == "Error")
         {
             // Sets the status text to the error
-            error.SetErrorStatus("Couldn't upload to server, because it contains Unsupported Symbol '-'");
+            status.SetStatus("Couldn't upload to server, because it contains Unsupported Symbol '-'");
         }
 
     }
@@ -151,7 +151,7 @@ public class AccountManager : MonoBehaviour
         if (Result.text == "Error")
         {
             // Sets the status text to the error
-            error.SetErrorStatus("Couldn't upload data to server");
+            status.SetStatus("Couldn't upload data to server");
         }
 
         else
@@ -159,7 +159,7 @@ public class AccountManager : MonoBehaviour
             if (Result.text == "ContainsUnsupportedSymbol")
             {
                 // Sets the status text to the error
-                error.SetErrorStatus("Couldn't receive from server, because it contains Unsupported Symbol '-'");
+                status.SetStatus("Couldn't receive from server, because it contains Unsupported Symbol '-'");
             }
 
             else

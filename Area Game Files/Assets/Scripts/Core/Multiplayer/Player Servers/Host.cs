@@ -15,6 +15,12 @@ public class Host : MonoBehaviour
 
     public Text Error;
 
+    public GameObject GameItemPrefab;
+    public Text ChildName;
+    public Text ChildDesc;
+    public Text ChildHost;
+    public Text ChildSize;
+
     // Start Method :: Called on start
     void Start ()
     {
@@ -48,6 +54,9 @@ public class Host : MonoBehaviour
 
             // Creates the photon room with the game settings
             PhotonNetwork.CreateRoom(GameName, GameSettings);
+
+
+
         }
 
         // If it's not, then set the error text

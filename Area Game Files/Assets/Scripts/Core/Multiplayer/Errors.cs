@@ -11,20 +11,27 @@ class Errors : MonoBehaviour
     public string Error_CreateGame = "Failed to create the game!";
     public string Error_JoinGame = "Failed to join the game!";
 
+    // Creates the instance variable
     public static Errors Instance;
 
     // Gets the status text element
     public Text Status;
 
+    // Awake Method :: Called at the very start
     void Awake()
     {
+
+        // Sets the instance to this
         Instance = this;
+
     }
 
     // SetErrorStatus Method :: Sets the status text to the error
-    public void SetErrorStatus(string Error)
+    public void SetStatus(string Error)
     {
+
         Status.text = Error;
+
     }
 
 }

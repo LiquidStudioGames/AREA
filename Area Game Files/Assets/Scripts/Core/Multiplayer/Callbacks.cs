@@ -1,8 +1,8 @@
 using Photon.Pun;
 using UnityEngine;
 
-using Photon.Pun;
 using Photon.Realtime;
+
 using System.Collections.Generic;
 
 public class Callbacks : MonoBehaviourPunCallbacks
@@ -34,21 +34,21 @@ public class Callbacks : MonoBehaviourPunCallbacks
     public override void OnCreateRoomFailed (short returnCode, string message)
     {
         // Sets the status to the CreateGame error message
-        error.SetErrorStatus(error.Error_CreateGame);
+        error.SetStatus(error.Error_CreateGame);
     }
 
     // This gets called whenever we fails to join a game
     public override void OnJoinRoomFailed (short returnCode, string message)
     {
         // Sets the status to the JoinGame error message
-        error.SetErrorStatus(error.Error_JoinGame);
+        error.SetStatus(error.Error_JoinGame);
     }
 
     // This gets called whenever we fails to join a random game
     public override void OnJoinRandomFailed (short returnCode, string message)
     {
         // Sets the status to the JoinGame error message
-        error.SetErrorStatus(error.Error_JoinGame);
+        error.SetStatus(error.Error_JoinGame);
     }
 
 }
