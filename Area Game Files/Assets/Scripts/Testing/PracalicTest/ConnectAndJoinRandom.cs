@@ -4,17 +4,19 @@ using UnityEngine;
 using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
 using Photon.Realtime;
+using Photon.Pun;
 
 
-namespace Photon.Realtime.Demo
+namespace pracalic
 {
-    public class ConnectAndJoinRandomLb : MonoBehaviour, IConnectionCallbacks, IMatchmakingCallbacks, ILobbyCallbacks
+    public class ConnectAndJoinRandom : MonoBehaviour, IConnectionCallbacks, IMatchmakingCallbacks, ILobbyCallbacks
     {
         public string AppId; // set in inspector
         private LoadBalancingClient lbc;
 
         private ConnectionHandler ch;
         public Text StateUiText;
+        public Text RoomNameText;
 
         public void Start()
         {
@@ -47,7 +49,7 @@ namespace Photon.Realtime.Demo
                 }
             }
 
-            
+
         }
 
 
@@ -58,6 +60,7 @@ namespace Photon.Realtime.Demo
         public void OnConnectedToMaster()
         {
             Debug.Log("OnConnectedToMaster");
+            
             this.lbc.OpJoinRandomRoom();    // joins any open room (no filter)
         }
 
@@ -106,18 +109,18 @@ namespace Photon.Realtime.Demo
 
         public void OnCreateRoomFailed(short returnCode, string message)
         {
-            Debug.Log("on create room failed");
         }
 
         public void OnJoinedRoom()
         {
             Debug.Log("OnJoinedRoom");
-            
+            RoomNameText.text = lbc.CurrentRoom.Name +  "    " + lbc.CurrentRoom.ToStringFull();
+            //Photon.Pun.
+
         }
 
         public void OnJoinRoomFailed(short returnCode, string message)
         {
-            Debug.Log("on join room failed");
         }
 
         public void OnJoinRandomFailed(short returnCode, string message)
