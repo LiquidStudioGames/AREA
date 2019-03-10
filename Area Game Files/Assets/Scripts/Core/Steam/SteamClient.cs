@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Threading;
 using UnityEngine;
 using Steamworks;
 
@@ -10,6 +12,7 @@ public class SteamClient
     public SteamPlayer Player;
     public SteamPlayerCollection players;
 
+    public event Action<byte[], SteamPlayer> OnPacket = delegate { };
     public event Action<LobbyEvent> OnLobbyEvent = delegate { };
     public event Action<SteamPlayer, PlayerStateChange> OnLobbyUpdated = delegate { };
 
@@ -19,7 +22,13 @@ public class SteamClient
     private Callback<LobbyChatUpdate_t> lobbyUpdate;
     private Callback<LobbyDataUpdate_t> lobbyDataUpdate;
     private Callback<GameLobbyJoinRequested_t> lobbyInvite;
+
     private Callback<PersonaStateChange_t> playerUpdate;
+    private Callback<P2PSessionRequest_t> sessionRequest;
+    private Callback<P2PSessionConnectFail_t> sessionFail;
+
+    private bool online;
+    private Thread thread;
 
     public bool Init()
     {
@@ -61,7 +70,7 @@ public class SteamClient
             m_SteamAPIWarningMessageHook = new SteamAPIWarningMessageHook_t(SteamAPIDebugTextHook);
             Steamworks.SteamClient.SetWarningMessageHook(m_SteamAPIWarningMessageHook);
         }
-        
+
         players = new SteamPlayerCollection();
         Player = SteamPlayer.FromID(SteamUser.GetSteamID());
         lobbyJoin = CallResult<LobbyEnter_t>.Create(LobbyJoined);
@@ -71,6 +80,8 @@ public class SteamClient
         lobbyDataUpdate = Callback<LobbyDataUpdate_t>.Create(LobbyDataUpdated);
         lobbyInvite = Callback<GameLobbyJoinRequested_t>.Create(LobbyInvite);
         playerUpdate = Callback<PersonaStateChange_t>.Create(players.PlayerUpdated);
+        sessionRequest = Callback<P2PSessionRequest_t>.Create(SessionRequest);
+        sessionFail = Callback<P2PSessionConnectFail_t>.Create(SessionFail);
         return true;
     }
 
@@ -82,6 +93,7 @@ public class SteamClient
 
     public void Stop()
     {
+        if (online) StopGame();
         if (Lobby != null) LeaveLobby();
         SteamAPI.Shutdown();
     }
@@ -122,6 +134,92 @@ public class SteamClient
         }
 
         else Debug.LogError("Error requesting ticket: " + response.m_eResult);
+    }
+    #endregion
+
+    #region Networking
+    public void StartGame()
+    {
+        online = true;
+        thread = new Thread(Listen);
+    }
+
+    public void StopGame()
+    {
+        online = false;
+        thread.Abort();
+    }
+
+    private void Listen()
+    {
+        uint length;
+        byte[] data;
+        CSteamID remote;
+
+        while (online)
+        {
+            try
+            {
+                while (SteamNetworking.IsP2PPacketAvailable(out length))
+                {
+                    data = new byte[length];
+
+                    if (SteamNetworking.ReadP2PPacket(data, 0, out length, out remote))
+                    {
+                        if (data.Length != length)
+                            Debug.Log($"Received different lengths {length}/{data.Length}");
+
+                        OnPacket(data, players.GetPlayer((ulong)remote));
+                    }
+                }
+
+            }
+
+            catch (Exception e)
+            {
+                Debug.Log($"Error in Listen {e.Message}");
+                StopGame();
+            }
+
+            Thread.Sleep(5);
+        }
+    }
+
+    public void SendPacket(byte[] packet, CSteamID remote, SendType sendType)
+    {
+        if (!SteamNetworking.SendP2PPacket(remote, packet, (uint)packet.Length, sendType == SendType.Reliable ? EP2PSend.k_EP2PSendReliable : EP2PSend.k_EP2PSendUnreliable))
+        {
+            Debug.LogError($"Failed to send packet to {remote}");
+        }
+    }
+
+    private void SessionRequest(P2PSessionRequest_t request)
+    {
+        if (Lobby != null)
+        {
+            if (Lobby.isHost && !Lobby.playerList.Any(x => x.ID == (ulong)request.m_steamIDRemote))
+            {
+                Debug.LogWarning($"Player outside this lobby tried to connect {request.m_steamIDRemote}");
+            }
+
+            else if (Lobby.host.ID != (ulong)request.m_steamIDRemote)
+            {
+                Debug.LogWarning($"Player who is not host of this lobby tried to connect {request.m_steamIDRemote}");
+            }
+
+            if (SteamNetworking.AcceptP2PSessionWithUser(request.m_steamIDRemote))
+            {
+                // Connected with remote
+                Debug.Log($"Connected to {request.m_steamIDRemote}");
+            }
+
+            else Debug.LogError($"Failed to accept session with {request.m_steamIDRemote}");
+        }
+    }
+
+    private void SessionFail(P2PSessionConnectFail_t fail)
+    {
+        Debug.LogWarning($"Failed to start session with {fail.m_steamIDRemote}: {fail.m_eP2PSessionError}");
     }
     #endregion
 
@@ -251,7 +349,15 @@ public class SteamClient
         lobbyDataUpdate.Dispose();
         lobbyInvite.Dispose();
         playerUpdate.Dispose();
+        sessionRequest.Dispose();
+        sessionFail.Dispose();
     }
+}
+
+public enum SendType
+{
+    Reliable,
+    Unreliable
 }
 
 public enum LobbyEvent
