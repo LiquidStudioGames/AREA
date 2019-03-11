@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
+using Steamworks;
+
 public class AccountUI : MonoBehaviour
 {
 
@@ -22,11 +24,14 @@ public class AccountUI : MonoBehaviour
     {
 
         // Checks if the user is logged in
-        if (AccountManager.LoggedIn)
+        if (SteamAPI.Init())
         {
 
+            // Set the name string to the steam users name
+            string name = SteamFriends.GetPersonaName();
+
             // If so, set the username text to the logged in username
-            Username.text = AccountManager.UserUsername;
+            Username.text = name;
 
         }
 
@@ -48,11 +53,10 @@ public class AccountUI : MonoBehaviour
     {
 
         // Checks if the user is logged in
-        if (AccountManager.LoggedIn)
+        if (SteamAPI.Init())
         {
 
-            // If you are, then call the logout method
-            AccountManager.Instance.Logout();
+            // Logout
 
         }
 
