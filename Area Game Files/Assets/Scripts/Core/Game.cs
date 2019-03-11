@@ -7,6 +7,7 @@ public class Game : MonoBehaviour
 
     public bool IsClient;
     public SteamClient Steam;
+    public NetworkScene NetworkScene;
 
     private void Awake()
     {

@@ -4,6 +4,7 @@ using System.Threading;
 using UnityEngine;
 using Steamworks;
 
+// I think I can optimize CSteamID to 32 bits
 public class SteamClient
 {
     #region Common
@@ -11,8 +12,7 @@ public class SteamClient
     public SteamLobby Lobby;
     public SteamPlayer Player;
     public SteamPlayerCollection players;
-
-    public event Action<byte[], SteamPlayer> OnPacket = delegate { };
+    
     public event Action<LobbyEvent> OnLobbyEvent = delegate { };
     public event Action<SteamPlayer, PlayerStateChange> OnLobbyUpdated = delegate { };
 
@@ -150,6 +150,14 @@ public class SteamClient
         thread.Abort();
     }
 
+    public void LoadLevel(int level)
+    {
+        // Check if I'm host
+        // Send scene to all clients
+        // Load scene
+        // Handle Spawns
+    }
+
     private void Listen()
     {
         uint length;
@@ -169,7 +177,43 @@ public class SteamClient
                         if (data.Length != length)
                             Debug.Log($"Received different lengths {length}/{data.Length}");
 
-                        OnPacket(data, players.GetPlayer((ulong)remote));
+                        BitStream stream = new BitStream(data);
+                        PacketType packetType = (PacketType)stream.ReadByte();
+
+                        switch (packetType)
+                        {
+                            case PacketType.Call:
+                                Game.Instance.NetworkScene.ReceiveCall(stream, SteamPlayer.FromID(remote));
+                                break;
+
+                            case PacketType.Proxy:
+                                {
+                                    SteamPlayer target = SteamPlayer.FromID((ulong)stream.ReadLong());
+                                    SendType type = (SendType)stream.ReadByte(1);
+                                    byte[] packet = stream.ReadBytes();
+                                    SendPacket(packet, target, type);
+                                }
+                                break;
+
+                            case PacketType.ProxyTarget:
+                                {
+                                    NetworkTarget target = (NetworkTarget)stream.ReadByte(2);
+                                    SendType type = (SendType)stream.ReadByte(1);
+                                    byte[] packet = stream.ReadBytes();
+
+                                    switch (target)
+                                    {
+                                        case NetworkTarget.All:
+                                            SendPackets(packet, type, null);
+                                            break;
+
+                                        case NetworkTarget.Others:
+                                            SendPackets(packet, type, SteamPlayer.FromID(remote));
+                                            break;
+                                    }
+                                }
+                                break;
+                        }
                     }
                 }
 
@@ -185,11 +229,71 @@ public class SteamClient
         }
     }
 
-    public void SendPacket(byte[] packet, CSteamID remote, SendType sendType)
+    internal void SendPacket(byte[] packet, SteamPlayer target, SendType sendType = SendType.Unreliable)
     {
-        if (!SteamNetworking.SendP2PPacket(remote, packet, (uint)packet.Length, sendType == SendType.Reliable ? EP2PSend.k_EP2PSendReliable : EP2PSend.k_EP2PSendUnreliable))
+        if (Game.Instance.Steam.Lobby.isHost || target == Game.Instance.Steam.Lobby.host)
         {
-            Debug.LogError($"Failed to send packet to {remote}");
+            if (!SteamNetworking.SendP2PPacket((CSteamID)target.ID, packet, (uint)packet.Length, sendType == SendType.Reliable ? EP2PSend.k_EP2PSendReliable : EP2PSend.k_EP2PSendUnreliable))
+            {
+                Debug.LogError($"Failed to send packet to {target.ID}");
+            }
+        }
+
+        else
+        {
+            byte[] proxyPacket = new BitStream().Write((byte)PacketType.Proxy).Write((long)target.ID).Write((byte)sendType, 1).Write(packet).GetBytes();
+
+            if (!SteamNetworking.SendP2PPacket((CSteamID)Lobby.host.ID, proxyPacket, (uint)proxyPacket.Length, sendType == SendType.Reliable ? EP2PSend.k_EP2PSendReliable : EP2PSend.k_EP2PSendUnreliable))
+            {
+                Debug.LogError($"Failed to send packet to {Lobby.host.ID}");
+            }
+        }
+    }
+
+    internal void SendPacket(byte[] packet, NetworkTarget target, SendType sendType = SendType.Unreliable)
+    {
+        if (Game.Instance.Steam.Lobby.isHost)
+        {
+            switch (target)
+            {
+                case NetworkTarget.All:
+                    SendPackets(packet, sendType, null);
+                    break;
+
+                case NetworkTarget.Others:
+                    SendPackets(packet, sendType, Player);
+                    break;
+
+                case NetworkTarget.Host:
+                    BitStream stream = new BitStream(packet);
+                    stream.ReadByte();
+                    Game.Instance.NetworkScene.ReceiveCall(stream, Player);
+                    break;
+            }
+        }
+
+        else
+        {
+            byte[] proxyPacket = new BitStream().Write((byte)PacketType.ProxyTarget).Write((byte)target, 2).Write((byte)sendType, 1).Write(packet).GetBytes();
+            
+            if (!SteamNetworking.SendP2PPacket((CSteamID)Lobby.host.ID, proxyPacket, (uint)proxyPacket.Length, sendType == SendType.Reliable ? EP2PSend.k_EP2PSendReliable : EP2PSend.k_EP2PSendUnreliable))
+            {
+                Debug.LogError($"Failed to send packet to {Lobby.host.ID}");
+            }
+        }
+    }
+
+    private void SendPackets(byte[] packet, SendType sendType, SteamPlayer exception)
+    {
+        foreach (SteamPlayer player in Lobby.playerList)
+        {
+            if (player != exception)
+            {
+                if (!SteamNetworking.SendP2PPacket((CSteamID)player.ID, packet, (uint)packet.Length, sendType == SendType.Reliable ? EP2PSend.k_EP2PSendReliable : EP2PSend.k_EP2PSendUnreliable))
+                {
+                    Debug.LogError($"Failed to send packet to {player.ID}");
+                }
+            }
         }
     }
 
@@ -354,10 +458,17 @@ public class SteamClient
     }
 }
 
-public enum SendType
+public enum SendType : byte // 1 bit
 {
-    Reliable,
-    Unreliable
+    Unreliable = 0,
+    Reliable = 1
+}
+
+public enum NetworkTarget : byte // 2 bits
+{
+    All = 0,
+    Others = 1,
+    Host = 2
 }
 
 public enum LobbyEvent

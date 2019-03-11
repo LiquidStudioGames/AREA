@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using System.Runtime.InteropServices;
+using UnityEngine;
 
 public interface INetworkObject
 {
@@ -295,6 +297,26 @@ public partial class BitStream
         return Write((byte)(o ? 1 : 0), 1);
     }
 
+    public BitStream Write(string o)
+    {
+        return Write(Encoding.UTF8.GetBytes(o));
+    }
+
+    public BitStream Write(Vector3 o)
+    {
+        Write(o.x);
+        Write(o.y);
+        return Write(o.z);
+    }
+
+    public BitStream Write(Quaternion o)
+    {
+        Vector3 e = o.eulerAngles;
+        Write(e.x);
+        Write(e.y);
+        return Write(e.z);
+    }
+
     public byte ReadByte(int bits = 8)
     {
         if (bits <= 0) return 0;
@@ -485,6 +507,21 @@ public partial class BitStream
     public bool ReadBool()
     {
         return ReadByte(1) == 1;
+    }
+
+    public string ReadString()
+    {
+        return Encoding.UTF8.GetString(ReadBytes());
+    }
+
+    public Vector3 ReadVector3()
+    {
+        return new Vector3(ReadFloat(), ReadFloat(), ReadFloat());
+    }
+
+    public Quaternion ReadQuaternion()
+    {
+        return Quaternion.Euler(ReadFloat(), ReadFloat(), ReadFloat());
     }
 
     public BitStream Write(INetworkObject o)
