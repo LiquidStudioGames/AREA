@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 58b525062b8b3db469dd159cb1ead63a
+guid: fa8c733c2daca8c48ae08182ec0441c3
 PluginImporter:
   externalObjects: {}
   serializedVersion: 2
@@ -20,56 +20,56 @@ PluginImporter:
     second:
       enabled: 0
       settings:
-        CPU: x86_64
+        CPU: x86
         DefaultValueInitialized: true
   - first:
       Facebook: Win
-    second:
-      enabled: 0
-      settings:
-        CPU: None
-  - first:
-      Facebook: Win64
     second:
       enabled: 1
       settings:
         CPU: AnyCPU
   - first:
-      Standalone: Linux
+      Facebook: Win64
     second:
       enabled: 0
       settings:
         CPU: None
   - first:
-      Standalone: Linux64
+      Standalone: Linux
     second:
       enabled: 1
       settings:
-        CPU: x86_64
+        CPU: x86
+  - first:
+      Standalone: Linux64
+    second:
+      enabled: 0
+      settings:
+        CPU: None
   - first:
       Standalone: LinuxUniversal
     second:
       enabled: 1
       settings:
-        CPU: x86_64
+        CPU: x86
   - first:
       Standalone: OSXUniversal
     second:
       enabled: 0
       settings:
-        CPU: x86_64
+        CPU: x86
   - first:
       Standalone: Win
-    second:
-      enabled: 0
-      settings:
-        CPU: None
-  - first:
-      Standalone: Win64
     second:
       enabled: 1
       settings:
         CPU: AnyCPU
+  - first:
+      Standalone: Win64
+    second:
+      enabled: 0
+      settings:
+        CPU: None
   userData: 
   assetBundleName: 
   assetBundleVariant: 

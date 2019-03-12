@@ -7,8 +7,7 @@ Assets/AssetStoreTools*
 
 # Ignore meta and dll files
 ![Aa]ssets/**/*.meta
-!/Area Game Files/*/Assets/*/Plugins/*.dll
-!/Area Game Files/*/Assets/*/Plugins/*/*.dll
+!*.dll
 
 # Visual Studio cache directory
 .vs/
