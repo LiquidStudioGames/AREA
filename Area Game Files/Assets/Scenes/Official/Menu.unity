@@ -237,8 +237,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -172, y: -53}
-  m_SizeDelta: {x: 312.90002, y: 70.5}
+  m_AnchoredPosition: {x: -245, y: -53}
+  m_SizeDelta: {x: 428.5, y: 70.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &522373208
 MonoBehaviour:
@@ -267,7 +267,7 @@ MonoBehaviour:
     m_BestFit: 0
     m_MinSize: 2
     m_MaxSize: 40
-    m_Alignment: 4
+    m_Alignment: 5
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
@@ -397,7 +397,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -163.5, y: 44.710007}
+  m_AnchoredPosition: {x: -1081, y: 121}
   m_SizeDelta: {x: 253, y: 37.410004}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &764978458
@@ -539,8 +539,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 165, y: 31.6}
-  m_SizeDelta: {x: 287.4, y: 41.2}
+  m_AnchoredPosition: {x: 1038.1, y: 36}
+  m_SizeDelta: {x: 348.36, y: 41.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &878325731
 MonoBehaviour:
@@ -569,7 +569,7 @@ MonoBehaviour:
     m_BestFit: 0
     m_MinSize: 2
     m_MaxSize: 40
-    m_Alignment: 3
+    m_Alignment: 5
     m_AlignByGeometry: 0
     m_RichText: 0
     m_HorizontalOverflow: 0
@@ -929,6 +929,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Menu Manager
       objectReference: {fileID: 0}
+    - target: {fileID: 7089770709135157166, guid: e3cabbed5ca4f784bb68214d1a8403a5,
+        type: 3}
+      propertyPath: Username
+      value: 
+      objectReference: {fileID: 522373208}
     - target: {fileID: 7089770709135157152, guid: e3cabbed5ca4f784bb68214d1a8403a5,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -984,11 +989,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7089770709135157166, guid: e3cabbed5ca4f784bb68214d1a8403a5,
-        type: 3}
-      propertyPath: Username
-      value: 
-      objectReference: {fileID: 522373208}
     - target: {fileID: 7089770709135157153, guid: e3cabbed5ca4f784bb68214d1a8403a5,
         type: 3}
       propertyPath: Status

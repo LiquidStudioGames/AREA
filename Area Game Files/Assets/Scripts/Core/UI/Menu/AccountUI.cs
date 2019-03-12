@@ -28,10 +28,12 @@ public class AccountUI : MonoBehaviour
         {
 
             // Set the name string to the steam users name
-            string name = SteamFriends.GetPersonaName();
+            string Name = SteamFriends.GetPersonaName();
+            string ID = SteamUser.GetSteamID().ToString();
 
-            // If so, set the username text to the logged in username
-            Username.text = name;
+            // If so, set the username text to the logged in username and set
+            // the tag to the first 7 numbers in the users steam id
+            Username.text = Name + "@" + ID.Substring(0, 7);
 
         }
 
