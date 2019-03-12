@@ -5,6 +5,10 @@
 [Bb]uilds/
 Assets/AssetStoreTools*
 
+# Ignore meta and dll files
+![Aa]ssets/**/*.meta
+!*.dll
+
 # Visual Studio cache directory
 .vs/
 
@@ -34,3 +38,4 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+Area Game Files/Assets/Scenes/Testing/TestScene.unity

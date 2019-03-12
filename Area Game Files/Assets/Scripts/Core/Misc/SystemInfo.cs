@@ -47,8 +47,8 @@ public class SystemInfo : MonoBehaviour
             ConnectionServer = "None";
         }
 
-        // For now, set status to nothing
-        Status = "";
+        // For now, set status to the message
+        Status = "Ready to play!";
     }
 
     // ToggleInfo Method :: Toggles the info window
