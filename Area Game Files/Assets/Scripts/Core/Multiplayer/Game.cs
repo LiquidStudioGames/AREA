@@ -23,11 +23,15 @@ public class Game : MonoBehaviour
 
     private void Start()
     {
+        NetworkScene = new NetworkScene();
+
         if (IsClient)
         {
             Steam = new SteamClient();
             if (!Steam.Init()) throw new Exception("Steam is not running.");
             Debug.Log($"Logged in as {Steam.Player.Name}");
+            Steam.CreateLobby();
+            Steam.OnLobbyEvent += OnLobbyEvent;
         }
     }
 
@@ -47,5 +51,14 @@ public class Game : MonoBehaviour
         }
 
         Instance = null;
+    }
+
+    private void OnLobbyEvent(LobbyEvent e)
+    {
+        if (e == LobbyEvent.Created)
+        {
+            Steam.StartListen();
+            Steam.LoadLevel("GameTestScene");
+        }
     }
 }
