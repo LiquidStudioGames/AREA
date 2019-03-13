@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-using Photon.Pun;
+using Steamworks;
 
 public class SystemInfo : MonoBehaviour
 {
@@ -31,14 +31,15 @@ public class SystemInfo : MonoBehaviour
         FPS = Mathf.RoundToInt(1f / Time.deltaTime);
 
         // Assigns the ping
-        Ping = PhotonNetwork.GetPing();
+        //Ping = PhotonNetwork.GetPing();
         
         // Checks if we're connected to the server
-        if (PhotonNetwork.IsConnected)
+        if (SteamAPI.Init())
         {
             // If we are, then assign the connection status and server
             ConnectionStatus = "Connected";
-            ConnectionServer = PhotonNetwork.Server.ToString();
+            // TODO: Change this to use Steam instead
+            //ConnectionServer = PhotonNetwork.Server.ToString();
         }
         else
         {
