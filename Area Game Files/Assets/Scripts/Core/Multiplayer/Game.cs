@@ -6,6 +6,7 @@ public class Game : MonoBehaviour
     public static Game Instance;
 
     public bool IsClient;
+    public GameObject UI;
     public SteamClient Steam;
     public NetworkScene NetworkScene;
 
@@ -19,6 +20,7 @@ public class Game : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+        DontDestroyOnLoad(UI);
     }
 
     private void Start()
@@ -30,8 +32,9 @@ public class Game : MonoBehaviour
             Steam = new SteamClient();
             if (!Steam.Init()) throw new Exception("Steam is not running.");
             Debug.Log($"Logged in as {Steam.Player.Name}");
-            Steam.CreateLobby();
             Steam.OnLobbyEvent += OnLobbyEvent;
+            Steam.OnLobbyListReceived += ShowLobbyList;
+            Steam.GetLobbyList();
         }
     }
 
@@ -53,10 +56,29 @@ public class Game : MonoBehaviour
         Instance = null;
     }
 
+    public void CreateLobby()
+    {
+        Steam.CreateLobby();
+    }
+
+    public void JoinLobby(ulong lobby)
+    {
+        Steam.JoinLobby(lobby);
+    }
+
+    private void ShowLobbyList()
+    {
+        foreach (SteamLobby lobby in Steam.lobbies.GetLobbies())
+        {
+            Debug.Log(lobby.ID);
+        }
+    }
+
     private void OnLobbyEvent(LobbyEvent e)
     {
         if (e == LobbyEvent.Created)
         {
+            // This is basically pressing 'Start Game' immediatly
             Steam.StartListen();
             Steam.LoadLevel("GameTestScene");
         }

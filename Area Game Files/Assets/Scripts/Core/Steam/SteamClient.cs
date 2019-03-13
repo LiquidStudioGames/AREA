@@ -1,25 +1,27 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
-using UnityEngine;
-using Steamworks;
-using UnityEngine.SceneManagement;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using Steamworks;
 
-// I think I can optimize CSteamID to 32 bits
 public class SteamClient
 {
     #region Common
     public bool Ready;
     public SteamLobby Lobby;
     public SteamPlayer Player;
+    public SteamLobbyCollection lobbies;
     public SteamPlayerCollection players;
 
+    public event Action OnLobbyListReceived = delegate { };
     public event Action<LobbyEvent> OnLobbyEvent = delegate { };
     public event Action<SteamPlayer, PlayerStateChange> OnLobbyUpdated = delegate { };
 
     private CallResult<LobbyEnter_t> lobbyJoin;
     private CallResult<LobbyCreated_t> lobbyCreate;
+    private CallResult<LobbyMatchList_t> lobbyListRequest;
     private Callback<LobbyChatMsg_t> lobbyMessage;
     private Callback<LobbyChatUpdate_t> lobbyUpdate;
     private Callback<LobbyDataUpdate_t> lobbyDataUpdate;
@@ -77,10 +79,12 @@ public class SteamClient
         }
 
         SceneManager.sceneLoaded += SceneLoaded;
+        lobbies = new SteamLobbyCollection();
         players = new SteamPlayerCollection();
         Player = SteamPlayer.FromID(SteamUser.GetSteamID());
         lobbyJoin = CallResult<LobbyEnter_t>.Create(LobbyJoined);
         lobbyCreate = CallResult<LobbyCreated_t>.Create(LobbyCreated);
+        lobbyListRequest = CallResult<LobbyMatchList_t>.Create(OnLobbyList);
         lobbyMessage = Callback<LobbyChatMsg_t>.Create(LobbyMessageReceived);
         lobbyUpdate = Callback<LobbyChatUpdate_t>.Create(LobbyChatUpdated);
         lobbyDataUpdate = Callback<LobbyDataUpdate_t>.Create(LobbyDataUpdated);
@@ -422,12 +426,19 @@ public class SteamClient
     #region Lobbies
     public void CreateLobby()
     {
-        lobbyCreate.Set(SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypeFriendsOnly, 6));
+        lobbyCreate.Set(SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypePublic, 4));
     }
 
     public void JoinLobby(ulong id)
     {
         lobbyJoin.Set(SteamMatchmaking.JoinLobby((CSteamID)id));
+    }
+
+    public void GetLobbyList()
+    {
+        SteamMatchmaking.AddRequestLobbyListDistanceFilter(ELobbyDistanceFilter.k_ELobbyDistanceFilterWorldwide);
+        SteamMatchmaking.AddRequestLobbyListStringFilter("Game", "Area", ELobbyComparison.k_ELobbyComparisonEqual);
+        lobbyListRequest.Set(SteamMatchmaking.RequestLobbyList());
     }
 
     public void LeaveLobby()
@@ -465,6 +476,26 @@ public class SteamClient
         }
     }
 
+    private void OnLobbyList(LobbyMatchList_t callback, bool failed)
+    {
+        if (failed)
+        {
+            Debug.LogError("Requesting lobbylist failed.");
+            return;
+        }
+
+        Debug.Log("Current Lobbies: " + callback.m_nLobbiesMatching);
+        lobbies.lobbies.Clear();
+
+        for (int i = 0; i < callback.m_nLobbiesMatching; i++)
+        {
+            ulong lobbyListID = (ulong)SteamMatchmaking.GetLobbyByIndex(i);
+            var lobby = lobbies[lobbyListID];
+        }
+
+        OnLobbyListReceived();
+    }
+
     private void LobbyCreated(LobbyCreated_t callback, bool failed)
     {
         if (failed)
@@ -476,7 +507,7 @@ public class SteamClient
         if (!SteamMatchmaking.RequestLobbyData((CSteamID)callback.m_ulSteamIDLobby))
             Debug.LogError("Failed to retrieve lobby data.");
 
-        Lobby = new SteamLobby(callback.m_ulSteamIDLobby);
+        Lobby = lobbies[callback.m_ulSteamIDLobby];
         Debug.Log("Lobby created: " + callback.m_ulSteamIDLobby);
         OnLobbyEvent(LobbyEvent.Created);
     }
@@ -489,7 +520,7 @@ public class SteamClient
             return;
         }
 
-        Lobby = new SteamLobby((CSteamID)callback.m_ulSteamIDLobby);
+        Lobby = lobbies[callback.m_ulSteamIDLobby];
         Debug.Log("Lobby Joined: " + callback.m_ulSteamIDLobby);
         OnLobbyEvent(LobbyEvent.Joined);
     }
@@ -502,10 +533,10 @@ public class SteamClient
     private void LobbyDataUpdated(LobbyDataUpdate_t callback)
     {
         Debug.Log($"Lobby {callback.m_ulSteamIDLobby} data updated: {callback.m_ulSteamIDMember}");
+        lobbies.LobbyDataUpdate(callback.m_ulSteamIDLobby);
 
         if (Lobby.ID == callback.m_ulSteamIDLobby)
         {
-            Lobby.DataUpdate();
             OnLobbyEvent(LobbyEvent.Updated);
         }
     }
@@ -513,11 +544,11 @@ public class SteamClient
     private void LobbyChatUpdated(LobbyChatUpdate_t callback)
     {
         Debug.Log("Lobby updated: " + callback.m_ulSteamIDLobby);
+        lobbies.LobbyUpdate(callback.m_ulSteamIDLobby);
 
         if (Lobby.ID == callback.m_ulSteamIDLobby)
         {
-            Lobby.Update();
-            OnLobbyUpdated(players.GetPlayer(callback.m_ulSteamIDUserChanged), (PlayerStateChange)callback.m_rgfChatMemberStateChange);
+            OnLobbyUpdated(players[callback.m_ulSteamIDUserChanged], (PlayerStateChange)callback.m_rgfChatMemberStateChange);
         }
     }
 
