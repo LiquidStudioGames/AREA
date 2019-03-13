@@ -24,7 +24,7 @@ public class AccountUI : MonoBehaviour
     {
 
         // Checks if the user is logged in
-        if (SteamAPI.Init())
+        if (SteamAPI.Init ())
         {
 
             // Set the name string to the steam users name
