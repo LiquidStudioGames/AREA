@@ -1,14 +1,26 @@
 ﻿using System;
 using UnityEngine;
 
+public enum GameState
+{
+    Login,
+    Menu,
+    Browse,
+    Game,
+    Settings
+}
+
 public class Game : MonoBehaviour
 {
     public static Game Instance;
 
     public bool IsClient;
-    public GameObject UI;
+
+    public UI UI;
     public SteamClient Steam;
     public NetworkScene NetworkScene;
+
+    public GameState State;
 
     private void Awake()
     {
@@ -20,22 +32,29 @@ public class Game : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
-        DontDestroyOnLoad(UI);
+        DontDestroyOnLoad(UI.gameObject);
     }
 
     private void Start()
     {
+        State = GameState.Login;
         NetworkScene = new NetworkScene();
 
         if (IsClient)
         {
             Steam = new SteamClient();
             if (!Steam.Init()) throw new Exception("Steam is not running.");
+            ChangeState(GameState.Menu);
             Debug.Log($"Logged in as {Steam.Player.Name}");
             Steam.OnLobbyEvent += OnLobbyEvent;
-            Steam.OnLobbyListReceived += ShowLobbyList;
-            Steam.GetLobbyList();
+            ChangeState(GameState.Browse);
         }
+    }
+
+    public void ChangeState(GameState state)
+    {
+        UI.UpdateState(State, state);
+        State = state;
     }
 
     private void Update()
@@ -56,28 +75,12 @@ public class Game : MonoBehaviour
         Instance = null;
     }
 
-    public void CreateLobby()
-    {
-        Steam.CreateLobby();
-    }
-
-    public void JoinLobby(ulong lobby)
-    {
-        Steam.JoinLobby(lobby);
-    }
-
-    private void ShowLobbyList()
-    {
-        foreach (SteamLobby lobby in Steam.lobbies.GetLobbies())
-        {
-            Debug.Log(lobby.ID);
-        }
-    }
-
     private void OnLobbyEvent(LobbyEvent e)
     {
-        if (e == LobbyEvent.Created)
+        if (e == LobbyEvent.Created || e == LobbyEvent.Joined)
         {
+            ChangeState(GameState.Game);
+
             // This is basically pressing 'Start Game' immediatly
             Steam.StartListen();
             Steam.LoadLevel("GameTestScene");
