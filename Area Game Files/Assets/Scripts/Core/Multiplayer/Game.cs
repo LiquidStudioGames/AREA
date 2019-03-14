@@ -17,6 +17,7 @@ public class Game : MonoBehaviour
     public bool IsClient;
 
     public UI UI;
+    public Settings Settings;
     public SteamClient Steam;
     public NetworkScene NetworkScene;
 
@@ -44,13 +45,15 @@ public class Game : MonoBehaviour
         {
             Steam = new SteamClient();
             if (!Steam.Init()) throw new Exception("Steam is not running.");
+            Settings = new Settings();
+            Settings.Load();
+
             ChangeState(GameState.Menu);
             Debug.Log($"Logged in as {Steam.Player.Name}");
             Steam.OnLobbyEvent += OnLobbyEvent;
-            ChangeState(GameState.Browse);
-        }
 
-        Settings.Instance.GetSettings();
+            ChangeState(GameState.Settings);
+        }
     }
 
     public void ChangeState(GameState state)

@@ -4,11 +4,13 @@ public class UI : MonoBehaviour
 {
     public GameObject Main;
     public GameObject Lobbies;
+    public GameObject Settings;
 
     void Start()
     {
         Main.SetActive(true);
-        Lobbies.SetActive(true);
+        Lobbies.SetActive(false);
+        Settings.SetActive(false);
     }
     
     public void UpdateState(GameState previous, GameState current)
@@ -22,6 +24,11 @@ public class UI : MonoBehaviour
             case GameState.Browse:
                 Lobbies.SetActive(false);
                 break;
+
+            case GameState.Settings:
+                Settings.SetActive(false);
+                break;
+
         }
 
         switch (current)
@@ -32,6 +39,10 @@ public class UI : MonoBehaviour
 
             case GameState.Browse:
                 Lobbies.SetActive(true);
+                break;
+
+            case GameState.Settings:
+                Settings.SetActive(true);
                 break;
         }
     }
