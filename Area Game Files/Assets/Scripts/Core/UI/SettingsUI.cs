@@ -54,13 +54,13 @@ public class SettingsUI : MonoBehaviour
 
     private void Update()
     {
-        CheckValue(GraphicsQuality.value, "GraphicsIndex", level => QualitySettings.SetQualityLevel(level));
+        CheckValue(GraphicsQuality.value, "GraphicsIndex", QualitySettings.SetQualityLevel);
         CheckValue(MusicOn.isOn, "Music", null);
         CheckValue(SoundsOn.isOn, "Sounds", null);
         CheckValue(MusicVolume.value, "MusicVolume", null);
         CheckValue(SoundsVolume.value, "SoundsVolume", null);
         CheckValue(AutoReloadOn.isOn, "AutoReload", null);
-        CheckValue(GameStatsOn.isOn, "GameStats", isOn => { Debug.Log(isOn); Debug.Log(Settings.Data.GameStats); });
+        CheckValue(GameStatsOn.isOn, "GameStats", null);
     }
 
     // Did some magic where you can couple a value to a field, the callback is called when a change is detected

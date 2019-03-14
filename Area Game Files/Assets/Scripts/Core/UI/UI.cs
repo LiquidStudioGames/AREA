@@ -6,7 +6,7 @@ public class UI : MonoBehaviour
     public GameObject Lobbies;
     public GameObject Settings;
 
-    void Start()
+    void Awake()
     {
         Main.SetActive(true);
         Lobbies.SetActive(false);
