@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 
 using Newtonsoft.Json;
-using Newtonsoft;
 
 using System.IO;
 using System.Collections.Generic;
@@ -45,6 +44,9 @@ public class MenuLoader : MonoBehaviour
             File.WriteAllText(Path, Json);
 
         }
+
+        // Calls the GetSettings Method to read the file
+        Settings.Instance.GetSettings();
 
     }
 
