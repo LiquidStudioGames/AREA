@@ -49,6 +49,8 @@ public class Game : MonoBehaviour
             Steam.OnLobbyEvent += OnLobbyEvent;
             ChangeState(GameState.Browse);
         }
+
+        Settings.Instance.GetSettings();
     }
 
     public void ChangeState(GameState state)

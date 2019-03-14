@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 
 using Newtonsoft.Json;
 
@@ -15,31 +14,25 @@ public class Settings : MonoBehaviour
     // Creates a public SettingsData variable with the name Data
     public SettingsData Data;
 
-    // Scene UI elements
-    public Dropdown GraphicsQuality;
-    public Toggle MusicOn;
-    public Toggle SoundsOn;
-    public Slider MusicVolume;
-    public Slider SoundsVolume;
-    public Toggle AutoReloadOn;
-    public Toggle GameStatsOn;
+    private SettingsUI settingsui;
+
+    // Settings
+    public int GraphicsIndex;
+    public bool MusicOn;
+    public bool SoundsOn;
+    public float MusicVolume;
+    public float SoundsVolume;
+    public bool AutoReloadOn;
+    public bool GameStatsOn;
 
     // Awake Method :: Gets called at the very start
     void Awake ()
     {
 
         // Sets the instance variable to this
-        Instance = this; 
+        Instance = this;
 
-    }
-
-    // Start Method :: Gets called at the start
-    void Start ()
-    {
-
-        // Call the GetSettings and SetSettings method
-        GetSettings ();
-        SetSettings ();
+        settingsui = SettingsUI.Instance; 
 
     }
 
@@ -76,21 +69,6 @@ public class Settings : MonoBehaviour
 
     }
 
-    // SetSettings Method :: Sets the scene UI elements
-    void SetSettings ()
-    {
-
-        // Assign all the scene items to the setting files data
-        GraphicsQuality.value = Data.GraphicsIndex;
-        MusicOn.isOn = Data.Music;
-        SoundsOn.isOn = Data.Sounds;
-        MusicVolume.value = Data.MusicVolume / 100;
-        SoundsVolume.value = Data.SoundsVolume / 100;
-        AutoReloadOn.isOn = Data.AutoReload;
-        GameStatsOn.isOn = Data.GameStats;
-
-    }
-
     // SaveSettings Method :: Saves the changed settings to the settings file
     public void SaveSettings ()
     {
@@ -106,13 +84,13 @@ public class Settings : MonoBehaviour
         {
 
             // Assign all the settings data settings
-            GraphicsIndex = GraphicsQuality.value,
-            Music = MusicOn.isOn,
-            Sounds = SoundsOn.isOn,
-            MusicVolume = MusicVolume.value * 100,
-            SoundsVolume = SoundsVolume.value * 100,
-            AutoReload = AutoReloadOn.isOn,
-            GameStats = GameStatsOn.isOn,
+            GraphicsIndex = settingsui.GraphicsQuality.value,
+            Music = settingsui.MusicOn.isOn,
+            Sounds = settingsui.SoundsOn.isOn,
+            MusicVolume = settingsui.MusicVolume.value * 100,
+            SoundsVolume = settingsui.SoundsVolume.value * 100,
+            AutoReload = settingsui.AutoReloadOn.isOn,
+            GameStats = settingsui.GameStatsOn.isOn,
 
         });
 
