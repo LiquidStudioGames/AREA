@@ -33,7 +33,6 @@ public class SteamClient
 
     private bool online;
     private Thread thread;
-    private Queue<Action> toUnity;
 
     public bool LoadingLevel = false;
 
@@ -99,15 +98,6 @@ public class SteamClient
     {
         if (!Ready) return;
         SteamAPI.RunCallbacks();
-
-        if (toUnity == null) return;
-        lock (toUnity)
-        {
-            while (toUnity.Count > 0)
-            {
-                toUnity.Dequeue()();
-            }
-        }
     }
 
     public void Stop()
@@ -115,12 +105,6 @@ public class SteamClient
         if (online) StopListen();
         if (Lobby != null) LeaveLobby();
         SteamAPI.Shutdown();
-    }
-
-    private void ToUnity(Action action)
-    {
-        lock (toUnity)
-            toUnity.Enqueue(action);
     }
 
     private SteamAPIWarningMessageHook_t m_SteamAPIWarningMessageHook;
@@ -166,14 +150,12 @@ public class SteamClient
     public void StartListen()
     {
         online = true;
-        toUnity = new Queue<Action>();
         thread = new Thread(Listen);
     }
 
     public void StopListen()
     {
         online = false;
-        toUnity.Clear();
         thread.Abort();
     }
 
@@ -210,7 +192,7 @@ public class SteamClient
 
         if (LoadingLevel)
         {
-            ToUnity(() => CheckSceneLoaded(spawns));
+            Game.Instance.ToUnity(() => CheckSceneLoaded(spawns));
         }
 
         else
@@ -263,7 +245,7 @@ public class SteamClient
         switch (packetType)
         {
             case PacketType.Call:
-                ToUnity(() => Game.Instance.NetworkScene.ReceiveCall(stream, sender));
+                Game.Instance.ToUnity(() => Game.Instance.NetworkScene.ReceiveCall(stream, sender));
                 break;
 
             case PacketType.Level:
@@ -271,7 +253,7 @@ public class SteamClient
                     string level = stream.ReadString();
                     Game.Instance.NetworkScene.Reset();
                     LoadingLevel = true;
-                    ToUnity(() => SceneManager.LoadScene(level));
+                    Game.Instance.ToUnity(() => SceneManager.LoadScene(level));
                 }
                 break;
 
@@ -280,7 +262,7 @@ public class SteamClient
                     ushort count = stream.ReadUShort();
                     List<NetworkSpawn> spawns = new List<NetworkSpawn>();
                     for (int i = 0; i < count; i++) spawns.Add(stream.ReadNetworkObject<NetworkSpawn>());
-                    ToUnity(() => CheckSceneLoaded(spawns));
+                    Game.Instance.ToUnity(() => CheckSceneLoaded(spawns));
                 }
                 break;
 

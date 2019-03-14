@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public enum GameState
@@ -23,6 +24,8 @@ public class Game : MonoBehaviour
 
     public GameState State;
 
+    private Queue<Action> toUnity;
+
     private void Awake()
     {
         if (Instance != null)
@@ -39,20 +42,21 @@ public class Game : MonoBehaviour
     private void Start()
     {
         State = GameState.Login;
+        toUnity = new Queue<Action>();
         NetworkScene = new NetworkScene();
 
         if (IsClient)
         {
             Steam = new SteamClient();
             if (!Steam.Init()) throw new Exception("Steam is not running.");
-            Settings = new Settings();
-            Settings.Load();
-
-            ChangeState(GameState.Menu);
             Debug.Log($"Logged in as {Steam.Player.Name}");
             Steam.OnLobbyEvent += OnLobbyEvent;
 
-            ChangeState(GameState.Settings);
+            Settings = new Settings();
+            Settings.Load();
+
+            // Delay the menu one frame
+            ToUnity(() => ChangeState(GameState.Menu));
         }
     }
 
@@ -62,11 +66,24 @@ public class Game : MonoBehaviour
         State = state;
     }
 
+    public void ToUnity(Action action)
+    {
+        lock (toUnity) toUnity.Enqueue(action);
+    }
+
     private void Update()
     {
         if (IsClient)
         {
             Steam.Update();
+        }
+        
+        lock (toUnity)
+        {
+            while (toUnity.Count > 0)
+            {
+                toUnity.Dequeue()();
+            }
         }
     }
 
