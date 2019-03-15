@@ -151,6 +151,7 @@ public class SteamClient
     {
         online = true;
         thread = new Thread(Listen);
+        thread.Start();
     }
 
     public void StopListen()
@@ -216,7 +217,7 @@ public class SteamClient
                 {
                     data = new byte[length];
 
-                    if (SteamNetworking.ReadP2PPacket(data, 0, out length, out remote))
+                    if (SteamNetworking.ReadP2PPacket(data, length, out length, out remote))
                     {
                         if (data.Length != length)
                             Debug.Log($"Received different lengths {length}/{data.Length}");
@@ -490,6 +491,7 @@ public class SteamClient
             Debug.LogError("Failed to retrieve lobby data.");
 
         Lobby = lobbies[callback.m_ulSteamIDLobby];
+        SteamMatchmaking.SetLobbyData((CSteamID)callback.m_ulSteamIDLobby, "Game", "Area");
         Debug.Log("Lobby created: " + callback.m_ulSteamIDLobby);
         OnLobbyEvent(LobbyEvent.Created);
     }
@@ -503,6 +505,7 @@ public class SteamClient
         }
 
         Lobby = lobbies[callback.m_ulSteamIDLobby];
+        Lobby.Update();
         Debug.Log("Lobby Joined: " + callback.m_ulSteamIDLobby);
         OnLobbyEvent(LobbyEvent.Joined);
     }
@@ -530,7 +533,25 @@ public class SteamClient
 
         if (Lobby.ID == callback.m_ulSteamIDLobby)
         {
-            OnLobbyUpdated(players[callback.m_ulSteamIDUserChanged], (PlayerStateChange)callback.m_rgfChatMemberStateChange);
+            SteamPlayer player = players[callback.m_ulSteamIDUserChanged];
+
+            switch ((PlayerStateChange)callback.m_rgfChatMemberStateChange)
+            {
+                case PlayerStateChange.Joined:
+                    {
+                        BitStream stream = new BitStream().Write((byte)PacketType.Level).Write(SceneManager.GetActiveScene().name);
+                        SendPacket(stream.GetBytes(), player, SendType.Reliable);
+
+                        ushort count = (ushort)Game.Instance.NetworkScene.spawns.Count;
+                        BitStream stream2 = new BitStream().Write((byte)PacketType.Spawns).Write(count);
+                        for (int i = 0; i < count; i++) stream2.Write(Game.Instance.NetworkScene.spawns[i]);
+
+                        SendPacket(stream2.GetBytes(), player, SendType.Reliable);
+                    }
+                    break;
+            }
+
+            OnLobbyUpdated(player, (PlayerStateChange)callback.m_rgfChatMemberStateChange);
         }
     }
 

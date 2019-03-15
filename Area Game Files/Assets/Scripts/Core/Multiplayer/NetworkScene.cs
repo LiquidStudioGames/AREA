@@ -152,7 +152,7 @@ public class NetworkScene
         uint tag = packet.ReadUInt();
         byte index = packet.ReadByte();
         BitStream stream = new BitStream(packet.ReadBytes());
-        tags[tag].HandleCall(index, sender, stream);
+        if (tags.ContainsKey(tag)) tags[tag].HandleCall(index, sender, stream);
     }
 }
 

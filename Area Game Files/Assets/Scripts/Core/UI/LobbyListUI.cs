@@ -6,10 +6,11 @@ public class LobbyListUI : MonoBehaviour
     public GameObject LobbyObj;
     public RectTransform List;
 
-    private SteamClient Steam => Game.Instance.Steam;
+    private SteamClient Steam;
 
     void Start()
     {
+        Steam = Game.Instance.Steam;
         Refresh();
         Steam.OnLobbyListReceived += ShowLobbyList;
     }
@@ -38,7 +39,6 @@ public class LobbyListUI : MonoBehaviour
 
         foreach (SteamLobby lobby in Steam.lobbies.GetLobbies())
         {
-            Debug.Log(lobby.ID);
             GameObject o = Instantiate(LobbyObj, List);
             o.GetComponentInChildren<Text>().text = lobby.ID.ToString();
             o.GetComponent<Button>().onClick.AddListener(() => Steam.JoinLobby(lobby.ID));
