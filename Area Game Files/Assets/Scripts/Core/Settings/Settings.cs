@@ -1,13 +1,13 @@
 ﻿using UnityEngine;
+
 using Newtonsoft.Json;
+
 using System;
 using System.IO;
 
-//@Munchii: I see you comment your code a lot, but refrain yourself of drowning
-// your code into comments. Only comment things that might be unclear. Every bit
-// of this file is clear so shouldn't really require comments.
 public class Settings
 {
+
     // Creates a string called path, which stores the settings path
     public string Path => Application.persistentDataPath + "/settings.json";
 
@@ -17,6 +17,7 @@ public class Settings
     // Load Method :: Reads the setting file and assign the data to a variable
     public void Load ()
     {
+
         if (File.Exists(Path))
         {
             // Creates a string called text, which stores the files content
@@ -36,15 +37,39 @@ public class Settings
         }
 
         else Data = new SettingsData();
+
+        if (Data.GameStats)
+        {
+            Game.Instance.UI.Stats.SetActive(true);
+        }
+
+        else
+        {
+            Game.Instance.UI.Stats.SetActive(false);
+        }
+
     }
 
     // Save Method :: Saves the changed settings to the settings file
     public void Save ()
     {
+
         // Convert the data to a JSON object
         string Json = JsonConvert.SerializeObject (Data);
 
         // Write the JSON data to the file
         File.WriteAllText (Path, Json);
+
+        if (Data.GameStats)
+        {
+            Game.Instance.UI.Stats.SetActive(true);
+        }
+
+        else
+        {
+            Game.Instance.UI.Stats.SetActive(false);
+        }
+
     }
+
 }

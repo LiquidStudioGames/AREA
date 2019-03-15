@@ -26,7 +26,7 @@ public class Game : MonoBehaviour
 
     private Queue<Action> toUnity;
 
-    private void Awake()
+    private void Awake ()
     {
         if (Instance != null)
         {
@@ -39,7 +39,7 @@ public class Game : MonoBehaviour
         DontDestroyOnLoad(UI.gameObject);
     }
 
-    private void Start()
+    private void Start ()
     {
         State = GameState.Login;
         toUnity = new Queue<Action>();
@@ -60,18 +60,18 @@ public class Game : MonoBehaviour
         }
     }
 
-    public void ChangeState(GameState state)
+    public void ChangeState (GameState state)
     {
         UI.UpdateState(State, state);
         State = state;
     }
 
-    public void ToUnity(Action action)
+    public void ToUnity (Action action)
     {
         lock (toUnity) toUnity.Enqueue(action);
     }
 
-    private void Update()
+    private void Update ()
     {
         if (IsClient)
         {
@@ -87,7 +87,7 @@ public class Game : MonoBehaviour
         }
     }
 
-    private void OnDestroy()
+    private void OnDestroy ()
     {
         if (IsClient)
         {
@@ -97,7 +97,7 @@ public class Game : MonoBehaviour
         Instance = null;
     }
 
-    private void OnLobbyEvent(LobbyEvent e)
+    private void OnLobbyEvent (LobbyEvent e)
     {
         if (e == LobbyEvent.Created || e == LobbyEvent.Joined)
         {

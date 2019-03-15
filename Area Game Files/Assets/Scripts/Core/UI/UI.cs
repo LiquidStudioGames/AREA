@@ -7,37 +7,39 @@ using UnityEditor;
 
 public class UI : MonoBehaviour
 {
-    public GameObject Main;
+
+    public GameObject Menu;
     public GameObject Lobbies;
     public GameObject Settings;
+    public GameObject Stats;
 
-    void Awake()
+    void Awake ()
     {
-        Main.SetActive(true);
+        Menu.SetActive(true);
         Lobbies.SetActive(false);
         Settings.SetActive(false);
     }
 
-    public void ChangeState(string state)
+    public void ChangeState (string state)
     {
         Game.Instance.ChangeState((GameState)Enum.Parse(typeof(GameState), state, true));
     }
 
-    public void Quit()
+    public void Quit ()
     {
 #if UNITY_EDITOR
-        EditorApplication.ExitPlaymode();
+        EditorApplication.ExitPlaymode ();
 #else
         Application.Quit();
 #endif
     }
 
-    public void UpdateState(GameState previous, GameState current)
+    public void UpdateState (GameState previous, GameState current)
     {
         switch (previous)
         {
             case GameState.Menu:
-                Main.SetActive(false);
+                Menu.SetActive(false);
                 break;
 
             case GameState.Browse:
@@ -53,7 +55,7 @@ public class UI : MonoBehaviour
         switch (current)
         {
             case GameState.Menu:
-                Main.SetActive(true);
+                Menu.SetActive(true);
                 break;
 
             case GameState.Browse:
@@ -65,4 +67,5 @@ public class UI : MonoBehaviour
                 break;
         }
     }
+
 }
