@@ -60,7 +60,7 @@ public class SettingsUI : MonoBehaviour
         CheckValue(MusicVolume.value, "MusicVolume", null);
         CheckValue(SoundsVolume.value, "SoundsVolume", null);
         CheckValue(AutoReloadOn.isOn, "AutoReload", null);
-        CheckValue(GameStatsOn.isOn, "GameStats", null);
+        CheckValue(GameStatsOn.isOn, "GameStats", Game.Instance.UI.Stats.SetActive);
     }
 
     // Did some magic where you can couple a value to a field, the callback is called when a change is detected
