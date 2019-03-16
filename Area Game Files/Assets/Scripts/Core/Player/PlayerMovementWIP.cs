@@ -34,6 +34,8 @@ public class PlayerMovementWIP : MonoBehaviour
     private CharacterController chController; //will be used for caracter collision
     private IPlayerInput reader;
     private bool wishJump;
+    private Vector3 wishdir;
+    private Transform parentTransform;
 
 
     // Awake is called when object is enabled
@@ -42,6 +44,7 @@ public class PlayerMovementWIP : MonoBehaviour
         reader = GetComponent<IPlayerInput>();
         chController = GetComponentInParent<CharacterController>();
         playerHeight = chController.bounds.extents.y;
+        parentTransform = GetComponentInParent<Transform>();
         
     }
 
@@ -76,13 +79,41 @@ public class PlayerMovementWIP : MonoBehaviour
 
     private void GroundMove()
     {
-        
+        // only apply friction if the player is not queuing a jump
+        if (!wishJump)
+        {
+            ApplyFriction(1f);
+        }
+
+        wishdir = desireDirection();
 
 
 
 
+    }
 
 
+    /// <summary>
+    /// Transforms input booleans to a vector3 used for horizontal plane movement
+    /// </summary>
+
+    private Vector3 desireDirection()
+    {
+        int forward = reader.Forward ? 1 : 0;
+        int backwards = reader.Backwards ? -1 : 0;
+        int rightwards = reader.Right ? 1 : 0;
+        int leftwards = reader.Left ? -1 : 0;
+
+        Vector3 result = new Vector3(rightwards + leftwards, 0, forward + backwards);
+        result.Normalize();
+
+
+        throw new NotImplementedException();
+    }
+
+    private void ApplyFriction(float fMultiplier)
+    {
+        throw new NotImplementedException();
     }
 
 
