@@ -76,7 +76,7 @@ public class SteamPlayer
     public static SteamPlayer FromID(ulong id)
     {
         if (!Game.Instance.IsClient) return new SteamPlayer(id);
-        return Game.Instance.Steam.players.GetPlayer(id);
+        return Game.Instance.Steam.players[id];
     }
 
     public static SteamPlayer FromID(CSteamID id)
@@ -101,10 +101,13 @@ public class SteamPlayerCollection
         players = new Dictionary<ulong, SteamPlayer>();
     }
 
-    public SteamPlayer GetPlayer(ulong id)
+    public SteamPlayer this[ulong id]
     {
-        if (!players.ContainsKey(id)) players.Add(id, new SteamPlayer(id));
-        return players[id];
+        get
+        {
+            if (!players.ContainsKey(id)) players.Add(id, new SteamPlayer(id));
+            return players[id];
+        }
     }
 
     public SteamPlayer[] GetFriends()

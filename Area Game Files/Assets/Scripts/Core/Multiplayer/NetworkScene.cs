@@ -1,13 +1,24 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
-using Steamworks;
 
 public class NetworkScene
 {
-    internal uint tagCount = 1;
+    internal uint tagCount;
     internal List<NetworkSpawn> spawns;
     internal Dictionary<uint, NetworkTag> tags;
+
+    public NetworkScene()
+    {
+        Reset();
+    }
+
+    public void Reset()
+    {
+        tagCount = 1;
+        spawns = new List<NetworkSpawn>();
+        tags = new Dictionary<uint, NetworkTag>();
+    }
 
     internal void HandleServerSpawn()
     {
@@ -141,7 +152,7 @@ public class NetworkScene
         uint tag = packet.ReadUInt();
         byte index = packet.ReadByte();
         BitStream stream = new BitStream(packet.ReadBytes());
-        tags[tag].HandleCall(index, sender, packet);
+        if (tags.ContainsKey(tag)) tags[tag].HandleCall(index, sender, stream);
     }
 }
 

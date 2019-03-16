@@ -18,7 +18,7 @@ class Errors : MonoBehaviour
     public Text Status;
 
     // Awake Method :: Called at the very start
-    void Awake()
+    void Awake ()
     {
 
         // Sets the instance to this
@@ -27,10 +27,11 @@ class Errors : MonoBehaviour
     }
 
     // SetErrorStatus Method :: Sets the status text to the error
-    public void SetStatus(string Error)
+    public void SetStatus (string Message)
     {
 
-        Status.text = Error;
+        // Sets the status text to the message
+        Status.text = Message;
 
     }
 
