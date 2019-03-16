@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -32,13 +33,14 @@ public class PlayerMovementWIP : MonoBehaviour
     private float groundSmooth = 0.1f; //Extra distance to smooth out rough terrain
     private CharacterController chController; //will be used for caracter collision
     private IPlayerInput reader;
+    private bool wishJump;
 
 
     // Awake is called when object is enabled
     void Awake()
     {
         reader = GetComponent<IPlayerInput>();
-        chController = GetComponent<CharacterController>();
+        chController = GetComponentInParent<CharacterController>();
         playerHeight = chController.bounds.extents.y;
         
     }
@@ -46,12 +48,67 @@ public class PlayerMovementWIP : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        /* Debug part of the code */
         Debug.DrawRay(transform.position, -transform.up * (playerHeight + groundSmooth), Color.red);
 
-    } 
-    
-    
+        // Movement part 
+        QueueJump();
+        if (IsGrounded())
+        {
+            GroundMove();
+        } else 
+        {
+            AirMove();
+        }
+
+
+
+
+
+
+
+    }
+
+    private void AirMove()
+    {
+        throw new NotImplementedException();
+    }
+
+    private void GroundMove()
+    {
+        
+
+
+
+
+
+
+    }
+
+
+    /// <summary>
+    /// Queues Jump 
+    /// </summary>
+    private void QueueJump()
+    {
+        if (holdJumpToBhop)
+        {
+            wishJump = reader.JumpingHeld;
+            return;
+        }
+
+        if (reader.JumpingPressed && !wishJump)
+        {
+            wishJump = true;
+        }
+        else
+        {
+            wishJump = false;
+        }
+            
+    }
+
+
     /// <returns>
     /// Retruns true if anything is under the player's feet
     /// </returns>
