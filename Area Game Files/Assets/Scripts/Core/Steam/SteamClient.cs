@@ -1,23 +1,27 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Steamworks;
 
-// I think I can optimize CSteamID to 32 bits
 public class SteamClient
 {
     #region Common
     public bool Ready;
     public SteamLobby Lobby;
     public SteamPlayer Player;
+    public SteamLobbyCollection lobbies;
     public SteamPlayerCollection players;
-    
+
+    public event Action OnLobbyListReceived = delegate { };
     public event Action<LobbyEvent> OnLobbyEvent = delegate { };
     public event Action<SteamPlayer, PlayerStateChange> OnLobbyUpdated = delegate { };
 
     private CallResult<LobbyEnter_t> lobbyJoin;
     private CallResult<LobbyCreated_t> lobbyCreate;
+    private CallResult<LobbyMatchList_t> lobbyListRequest;
     private Callback<LobbyChatMsg_t> lobbyMessage;
     private Callback<LobbyChatUpdate_t> lobbyUpdate;
     private Callback<LobbyDataUpdate_t> lobbyDataUpdate;
@@ -29,6 +33,8 @@ public class SteamClient
 
     private bool online;
     private Thread thread;
+
+    public bool LoadingLevel = false;
 
     public bool Init()
     {
@@ -71,10 +77,13 @@ public class SteamClient
             Steamworks.SteamClient.SetWarningMessageHook(m_SteamAPIWarningMessageHook);
         }
 
+        SceneManager.sceneLoaded += SceneLoaded;
+        lobbies = new SteamLobbyCollection();
         players = new SteamPlayerCollection();
         Player = SteamPlayer.FromID(SteamUser.GetSteamID());
         lobbyJoin = CallResult<LobbyEnter_t>.Create(LobbyJoined);
         lobbyCreate = CallResult<LobbyCreated_t>.Create(LobbyCreated);
+        lobbyListRequest = CallResult<LobbyMatchList_t>.Create(OnLobbyList);
         lobbyMessage = Callback<LobbyChatMsg_t>.Create(LobbyMessageReceived);
         lobbyUpdate = Callback<LobbyChatUpdate_t>.Create(LobbyChatUpdated);
         lobbyDataUpdate = Callback<LobbyDataUpdate_t>.Create(LobbyDataUpdated);
@@ -93,7 +102,7 @@ public class SteamClient
 
     public void Stop()
     {
-        if (online) StopGame();
+        if (online) StopListen();
         if (Lobby != null) LeaveLobby();
         SteamAPI.Shutdown();
     }
@@ -138,24 +147,60 @@ public class SteamClient
     #endregion
 
     #region Networking
-    public void StartGame()
+    public void StartListen()
     {
         online = true;
         thread = new Thread(Listen);
+        thread.Start();
     }
 
-    public void StopGame()
+    public void StopListen()
     {
         online = false;
         thread.Abort();
     }
 
-    public void LoadLevel(int level)
+    public void LoadLevel(string level)
     {
-        // Check if I'm host
-        // Send scene to all clients
-        // Load scene
-        // Handle Spawns
+        if (!Lobby.isHost) return;
+
+        LoadingLevel = true;
+        BitStream stream = new BitStream().Write((byte)PacketType.Level).Write(level);
+        SendPackets(stream.GetBytes(), SendType.Reliable, Player);
+        Game.Instance.NetworkScene.Reset();
+        SceneManager.LoadScene(level);
+    }
+
+    private void SceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        LoadingLevel = false;
+
+        if (Lobby.isHost)
+        {
+            Game.Instance.NetworkScene.HandleServerSpawn();
+            ushort count = (ushort)Game.Instance.NetworkScene.spawns.Count;
+
+            BitStream stream = new BitStream().Write((byte)PacketType.Spawns).Write(count);
+            for (int i = 0; i < count; i++) stream.Write(Game.Instance.NetworkScene.spawns[i]);
+
+            SendPackets(stream.GetBytes(), SendType.Reliable, Player);
+        }
+    }
+
+    private void CheckSceneLoaded(List<NetworkSpawn> spawns)
+    {
+        if (Lobby.isHost) return;
+
+        if (LoadingLevel)
+        {
+            Game.Instance.ToUnity(() => CheckSceneLoaded(spawns));
+        }
+
+        else
+        {
+            Game.Instance.NetworkScene.spawns = spawns;
+            Game.Instance.NetworkScene.HandleClientSpawn();
+        }
     }
 
     private void Listen()
@@ -172,48 +217,12 @@ public class SteamClient
                 {
                     data = new byte[length];
 
-                    if (SteamNetworking.ReadP2PPacket(data, 0, out length, out remote))
+                    if (SteamNetworking.ReadP2PPacket(data, length, out length, out remote))
                     {
                         if (data.Length != length)
                             Debug.Log($"Received different lengths {length}/{data.Length}");
 
-                        BitStream stream = new BitStream(data);
-                        PacketType packetType = (PacketType)stream.ReadByte();
-
-                        switch (packetType)
-                        {
-                            case PacketType.Call:
-                                Game.Instance.NetworkScene.ReceiveCall(stream, SteamPlayer.FromID(remote));
-                                break;
-
-                            case PacketType.Proxy:
-                                {
-                                    SteamPlayer target = SteamPlayer.FromID((ulong)stream.ReadLong());
-                                    SendType type = (SendType)stream.ReadByte(1);
-                                    byte[] packet = stream.ReadBytes();
-                                    SendPacket(packet, target, type);
-                                }
-                                break;
-
-                            case PacketType.ProxyTarget:
-                                {
-                                    NetworkTarget target = (NetworkTarget)stream.ReadByte(2);
-                                    SendType type = (SendType)stream.ReadByte(1);
-                                    byte[] packet = stream.ReadBytes();
-
-                                    switch (target)
-                                    {
-                                        case NetworkTarget.All:
-                                            SendPackets(packet, type, null);
-                                            break;
-
-                                        case NetworkTarget.Others:
-                                            SendPackets(packet, type, SteamPlayer.FromID(remote));
-                                            break;
-                                    }
-                                }
-                                break;
-                        }
+                        ReceivePacket(data, SteamPlayer.FromID(remote));
                     }
                 }
 
@@ -222,10 +231,69 @@ public class SteamClient
             catch (Exception e)
             {
                 Debug.Log($"Error in Listen {e.Message}");
-                StopGame();
+                StopListen();
             }
 
             Thread.Sleep(5);
+        }
+    }
+
+    internal void ReceivePacket(byte[] data, SteamPlayer sender)
+    {
+        BitStream stream = new BitStream(data);
+        PacketType packetType = (PacketType)stream.ReadByte();
+
+        switch (packetType)
+        {
+            case PacketType.Call:
+                Game.Instance.ToUnity(() => Game.Instance.NetworkScene.ReceiveCall(stream, sender));
+                break;
+
+            case PacketType.Level:
+                {
+                    string level = stream.ReadString();
+                    Game.Instance.NetworkScene.Reset();
+                    LoadingLevel = true;
+                    Game.Instance.ToUnity(() => SceneManager.LoadScene(level));
+                }
+                break;
+
+            case PacketType.Spawns:
+                {
+                    ushort count = stream.ReadUShort();
+                    List<NetworkSpawn> spawns = new List<NetworkSpawn>();
+                    for (int i = 0; i < count; i++) spawns.Add(stream.ReadNetworkObject<NetworkSpawn>());
+                    Game.Instance.ToUnity(() => CheckSceneLoaded(spawns));
+                }
+                break;
+
+            case PacketType.Proxy:
+                {
+                    SteamPlayer target = SteamPlayer.FromID((ulong)stream.ReadLong());
+                    SendType type = (SendType)stream.ReadByte(1);
+                    byte[] packet = stream.ReadBytes();
+                    SendPacket(packet, target, type);
+                }
+                break;
+
+            case PacketType.ProxyTarget:
+                {
+                    NetworkTarget target = (NetworkTarget)stream.ReadByte(2);
+                    SendType type = (SendType)stream.ReadByte(1);
+                    byte[] packet = stream.ReadBytes();
+
+                    switch (target)
+                    {
+                        case NetworkTarget.All:
+                            SendPackets(packet, type, null);
+                            break;
+
+                        case NetworkTarget.Others:
+                            SendPackets(packet, type, sender);
+                            break;
+                    }
+                }
+                break;
         }
     }
 
@@ -265,31 +333,42 @@ public class SteamClient
                     break;
 
                 case NetworkTarget.Host:
-                    BitStream stream = new BitStream(packet);
-                    stream.ReadByte();
-                    Game.Instance.NetworkScene.ReceiveCall(stream, Player);
+                    ReceivePacket(packet, Player);
                     break;
             }
         }
 
         else
         {
-            byte[] proxyPacket = new BitStream().Write((byte)PacketType.ProxyTarget).Write((byte)target, 2).Write((byte)sendType, 1).Write(packet).GetBytes();
-            
-            if (!SteamNetworking.SendP2PPacket((CSteamID)Lobby.host.ID, proxyPacket, (uint)proxyPacket.Length, sendType == SendType.Reliable ? EP2PSend.k_EP2PSendReliable : EP2PSend.k_EP2PSendUnreliable))
+            if (target == NetworkTarget.Host)
             {
-                Debug.LogError($"Failed to send packet to {Lobby.host.ID}");
+                SendPacket(packet, Lobby.host, sendType);
+            }
+
+            else
+            {
+                byte[] proxyPacket = new BitStream().Write((byte)PacketType.ProxyTarget).Write((byte)target, 2).Write((byte)sendType, 1).Write(packet).GetBytes();
+
+                if (!SteamNetworking.SendP2PPacket((CSteamID)Lobby.host.ID, proxyPacket, (uint)proxyPacket.Length, sendType == SendType.Reliable ? EP2PSend.k_EP2PSendReliable : EP2PSend.k_EP2PSendUnreliable))
+                {
+                    Debug.LogError($"Failed to send packet to {Lobby.host.ID}");
+                }
             }
         }
     }
 
-    private void SendPackets(byte[] packet, SendType sendType, SteamPlayer exception)
+    private void SendPackets(byte[] packet, SendType sendType, SteamPlayer exception = null)
     {
         foreach (SteamPlayer player in Lobby.playerList)
         {
             if (player != exception)
             {
-                if (!SteamNetworking.SendP2PPacket((CSteamID)player.ID, packet, (uint)packet.Length, sendType == SendType.Reliable ? EP2PSend.k_EP2PSendReliable : EP2PSend.k_EP2PSendUnreliable))
+                if (player == Player)
+                {
+                    ReceivePacket(packet, Player);
+                }
+
+                else if (!SteamNetworking.SendP2PPacket((CSteamID)player.ID, packet, (uint)packet.Length, sendType == SendType.Reliable ? EP2PSend.k_EP2PSendReliable : EP2PSend.k_EP2PSendUnreliable))
                 {
                     Debug.LogError($"Failed to send packet to {player.ID}");
                 }
@@ -330,7 +409,7 @@ public class SteamClient
     #region Lobbies
     public void CreateLobby()
     {
-        lobbyCreate.Set(SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypeFriendsOnly, 6));
+        lobbyCreate.Set(SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypePublic, 4));
     }
 
     public void JoinLobby(ulong id)
@@ -338,13 +417,20 @@ public class SteamClient
         lobbyJoin.Set(SteamMatchmaking.JoinLobby((CSteamID)id));
     }
 
+    public void GetLobbyList()
+    {
+        SteamMatchmaking.AddRequestLobbyListDistanceFilter(ELobbyDistanceFilter.k_ELobbyDistanceFilterWorldwide);
+        SteamMatchmaking.AddRequestLobbyListStringFilter("Game", "Area", ELobbyComparison.k_ELobbyComparisonEqual);
+        lobbyListRequest.Set(SteamMatchmaking.RequestLobbyList());
+    }
+
     public void LeaveLobby()
     {
         if (Lobby != null)
         {
             SteamMatchmaking.LeaveLobby((CSteamID)Lobby.ID);
-            Lobby = null;
             Debug.Log("Left lobby " + Lobby.ID.ToString());
+            Lobby = null;
             OnLobbyEvent(LobbyEvent.Left);
         }
     }
@@ -373,6 +459,26 @@ public class SteamClient
         }
     }
 
+    private void OnLobbyList(LobbyMatchList_t callback, bool failed)
+    {
+        if (failed)
+        {
+            Debug.LogError("Requesting lobbylist failed.");
+            return;
+        }
+
+        Debug.Log("Current Lobbies: " + callback.m_nLobbiesMatching);
+        lobbies.lobbies.Clear();
+
+        for (int i = 0; i < callback.m_nLobbiesMatching; i++)
+        {
+            ulong lobbyListID = (ulong)SteamMatchmaking.GetLobbyByIndex(i);
+            var lobby = lobbies[lobbyListID];
+        }
+
+        OnLobbyListReceived();
+    }
+
     private void LobbyCreated(LobbyCreated_t callback, bool failed)
     {
         if (failed)
@@ -384,7 +490,8 @@ public class SteamClient
         if (!SteamMatchmaking.RequestLobbyData((CSteamID)callback.m_ulSteamIDLobby))
             Debug.LogError("Failed to retrieve lobby data.");
 
-        Lobby = new SteamLobby(callback.m_ulSteamIDLobby);
+        Lobby = lobbies[callback.m_ulSteamIDLobby];
+        SteamMatchmaking.SetLobbyData((CSteamID)callback.m_ulSteamIDLobby, "Game", "Area");
         Debug.Log("Lobby created: " + callback.m_ulSteamIDLobby);
         OnLobbyEvent(LobbyEvent.Created);
     }
@@ -397,7 +504,8 @@ public class SteamClient
             return;
         }
 
-        Lobby = new SteamLobby((CSteamID)callback.m_ulSteamIDLobby);
+        Lobby = lobbies[callback.m_ulSteamIDLobby];
+        Lobby.Update();
         Debug.Log("Lobby Joined: " + callback.m_ulSteamIDLobby);
         OnLobbyEvent(LobbyEvent.Joined);
     }
@@ -410,10 +518,10 @@ public class SteamClient
     private void LobbyDataUpdated(LobbyDataUpdate_t callback)
     {
         Debug.Log($"Lobby {callback.m_ulSteamIDLobby} data updated: {callback.m_ulSteamIDMember}");
+        lobbies.LobbyDataUpdate(callback.m_ulSteamIDLobby);
 
         if (Lobby.ID == callback.m_ulSteamIDLobby)
         {
-            Lobby.DataUpdate();
             OnLobbyEvent(LobbyEvent.Updated);
         }
     }
@@ -421,11 +529,29 @@ public class SteamClient
     private void LobbyChatUpdated(LobbyChatUpdate_t callback)
     {
         Debug.Log("Lobby updated: " + callback.m_ulSteamIDLobby);
+        lobbies.LobbyUpdate(callback.m_ulSteamIDLobby);
 
         if (Lobby.ID == callback.m_ulSteamIDLobby)
         {
-            Lobby.Update();
-            OnLobbyUpdated(players.GetPlayer(callback.m_ulSteamIDUserChanged), (PlayerStateChange)callback.m_rgfChatMemberStateChange);
+            SteamPlayer player = players[callback.m_ulSteamIDUserChanged];
+
+            switch ((PlayerStateChange)callback.m_rgfChatMemberStateChange)
+            {
+                case PlayerStateChange.Joined:
+                    {
+                        BitStream stream = new BitStream().Write((byte)PacketType.Level).Write(SceneManager.GetActiveScene().name);
+                        SendPacket(stream.GetBytes(), player, SendType.Reliable);
+
+                        ushort count = (ushort)Game.Instance.NetworkScene.spawns.Count;
+                        BitStream stream2 = new BitStream().Write((byte)PacketType.Spawns).Write(count);
+                        for (int i = 0; i < count; i++) stream2.Write(Game.Instance.NetworkScene.spawns[i]);
+
+                        SendPacket(stream2.GetBytes(), player, SendType.Reliable);
+                    }
+                    break;
+            }
+
+            OnLobbyUpdated(player, (PlayerStateChange)callback.m_rgfChatMemberStateChange);
         }
     }
 

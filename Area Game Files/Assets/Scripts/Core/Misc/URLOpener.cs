@@ -8,7 +8,7 @@ public class URLOpener : MonoBehaviour
     {
 
         // Opens the given url
-        System.Diagnostics.Process.Start(URL);
+        System.Diagnostics.Process.Start (URL);
 
     }
 

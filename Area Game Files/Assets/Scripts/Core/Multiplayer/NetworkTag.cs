@@ -15,6 +15,7 @@ public enum PacketType : byte
     Level = 3,
     Proxy = 4,
     ProxyTarget = 5,
+    Spawns = 6,
     Call = 10
 }
 
@@ -59,7 +60,7 @@ public class NetworkTag : MonoBehaviour
             {
                 try
                 {
-                    NetworkCall call = (NetworkCall)Delegate.CreateDelegate(typeof(NetworkCall), this, info);
+                    NetworkCall call = (NetworkCall)Delegate.CreateDelegate(typeof(NetworkCall), component, info);
                     if (calls.ContainsKey(info.Name)) Debug.LogWarning("Duplicate callback for: " + info.Name);
                     else calls.Add(info.Name, call);
                 }
