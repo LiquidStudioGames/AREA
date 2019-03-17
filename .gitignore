@@ -5,6 +5,10 @@
 [Bb]uilds/
 Assets/AssetStoreTools*
 
+# Ignore meta and dll files
+![Aa]ssets/**/*.meta
+!*.dll
+
 # Visual Studio cache directory
 .vs/
 
