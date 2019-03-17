@@ -236,7 +236,7 @@ public class PlayerMovementFixed : MonoBehaviour
         drop = 0.0f;
 
         /* Only if the player is on the ground then apply friction */
-        if (IsGrounded())
+        if (chController.isGrounded)
         {
             control = speed < runDeacceleration ? runDeacceleration : speed;
             drop = control * friction * Time.fixedDeltaTime * fMultiplier;
@@ -283,13 +283,7 @@ public class PlayerMovementFixed : MonoBehaviour
     /// </returns>
     private bool IsGrounded()
     {
-        if(Physics.Raycast(transform.position, -transform.up, playerHeight, groundCollision))
-        {
-            Debug.Log("player is grounded");
-            return true;
-
-        }
-        return false;
+        return chController.isGrounded;
 
     }
 

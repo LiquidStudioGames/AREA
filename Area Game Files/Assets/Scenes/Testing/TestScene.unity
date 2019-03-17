@@ -602,7 +602,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 672198171}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.25, y: 1.24, z: -4.65}
+  m_LocalPosition: {x: -0.25, y: 1.12, z: -4.65}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1824116761}
@@ -732,6 +732,7 @@ GameObject:
   - component: {fileID: 764528172}
   - component: {fileID: 764528170}
   - component: {fileID: 764528171}
+  - component: {fileID: 764528173}
   m_Layer: 0
   m_Name: Controllers
   m_TagString: Untagged
@@ -772,7 +773,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 764528168}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 155039f8712ac764983ea093ccf59c12, type: 3}
   m_Name: 
@@ -806,6 +807,34 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   KeyBindings: {fileID: 11400000, guid: 597852b3cadc5a9458011a3ff6ae67ed, type: 2}
+--- !u!114 &764528173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 764528168}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ba509fa1cb0ce045b397db8505b6836, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  groundCollision:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  gravity: 20
+  downGravityMultiplier: 1.2
+  friction: 6
+  baseSpeed: 7
+  runAcceleration: 14
+  runDeacceleration: 10
+  airAcceleration: 2
+  airDecceleration: 2
+  airControl: 0.3
+  sideStrafeAcceleration: 50
+  sideStrafeSpeed: 1
+  jumpSpeed: 8
+  holdJumpToBhop: 0
 --- !u!1 &1008436150
 GameObject:
   m_ObjectHideFlags: 0

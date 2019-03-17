@@ -13,7 +13,6 @@ public class PlayerMovement : MonoBehaviour
 
     // Movement factors 
     public float gravity = 20.0f;
-    [Range(0.3f, 2f)]
     public float downGravityMultiplier = 1.2f;    //gravity mult for falls, higher than one = weightier falls
     public float friction = 6;                    //Ground friction
     public float baseSpeed = 7.0f;                // Ground move speed
@@ -47,7 +46,7 @@ public class PlayerMovement : MonoBehaviour
         chController = GetComponentInParent<CharacterController>();
         playerHeight = chController.bounds.extents.y;
         parentTransform = GetComponentInParent<Transform>();
-        
+
     }
 
     // Update is called once per frame
@@ -61,7 +60,8 @@ public class PlayerMovement : MonoBehaviour
         if (IsGrounded())
         {
             GroundMove();
-        } else 
+        }
+        else
         {
             AirMove();
         }
@@ -93,7 +93,7 @@ public class PlayerMovement : MonoBehaviour
         float wishSpeed2 = wishSpeed;
 
         //if the player is only strafing
-        if(reader.Forward && reader.Backwards)
+        if (reader.Forward && reader.Backwards)
         {
             if (wishSpeed > sideStrafeSpeed) wishSpeed = sideStrafeSpeed;
 
@@ -104,10 +104,11 @@ public class PlayerMovement : MonoBehaviour
         if (airControl > 0)
             AirControl(wishDir, wishSpeed2);
 
-        if(playerVelocity.y < 0)
+        if (playerVelocity.y < 0)
         {
             playerVelocity.y -= gravity * Time.deltaTime * downGravityMultiplier;
-        } else
+        }
+        else
         {
             playerVelocity.y -= gravity * Time.deltaTime;
         }
@@ -174,7 +175,7 @@ public class PlayerMovement : MonoBehaviour
         if (wishJump)
         {
             playerVelocity.y = jumpSpeed;
-            wishJump = false;         
+            wishJump = false;
         }
 
     }
@@ -270,7 +271,7 @@ public class PlayerMovement : MonoBehaviour
         {
             wishJump = false;
         }
-            
+
     }
 
 
@@ -280,7 +281,7 @@ public class PlayerMovement : MonoBehaviour
     private bool IsGrounded()
     {
 
-        return Physics.Raycast(transform.position, -transform.up, playerHeight+groundSmooth, groundCollision);
+        return Physics.Raycast(transform.position, -transform.up, playerHeight + groundSmooth, groundCollision);
 
     }
 
