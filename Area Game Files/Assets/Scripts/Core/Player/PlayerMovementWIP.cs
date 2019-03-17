@@ -9,7 +9,7 @@ public class PlayerMovementWIP : MonoBehaviour
     [SerializeField]
     private LayerMask groundCollision;
 
-    
+
 
     // Movement factors 
     public float gravity = 20.0f;
@@ -34,8 +34,9 @@ public class PlayerMovementWIP : MonoBehaviour
     private CharacterController chController; //will be used for caracter collision
     private IPlayerInput reader;
     private bool wishJump;
-    private Vector3 wishdir;
+    private Vector3 moveDirNorm;
     private Transform parentTransform;
+    private float wishSpeed;
 
 
     // Awake is called when object is enabled
@@ -85,11 +86,26 @@ public class PlayerMovementWIP : MonoBehaviour
             ApplyFriction(1f);
         }
 
-        wishdir = desireDirection();
+        moveDirNorm = DesireDirection();
+        wishSpeed = moveDirNorm.magnitude;
+        wishSpeed *= baseSpeed;
+        Accelerate(DesireDirection(), wishSpeed, runAcceleration);
 
 
+        //Resets gravity if grounded
+        playerVelocity.y = -gravity * Time.deltaTime;
 
+        if (wishJump)
+        {
+            playerVelocity.y = jumpSpeed;
+            wishJump = false;
+        }
 
+    }
+
+    private void Accelerate(Vector3 vector3, float wishSpeed, float runAcceleration)
+    {
+        throw new NotImplementedException();
     }
 
 
@@ -97,18 +113,14 @@ public class PlayerMovementWIP : MonoBehaviour
     /// Transforms input booleans to a vector3 used for horizontal plane movement
     /// </summary>
 
-    private Vector3 desireDirection()
+    private Vector3 DesireDirection()
     {
-        int forward = reader.Forward ? 1 : 0;
-        int backwards = reader.Backwards ? -1 : 0;
-        int rightwards = reader.Right ? 1 : 0;
-        int leftwards = reader.Left ? -1 : 0;
 
-        Vector3 result = new Vector3(rightwards + leftwards, 0, forward + backwards);
+        Vector3 result = new Vector3((reader.Right ? 1 : 0) + (reader.Left ? -1 : 0), 0, (reader.Forward ? 1 : 0) + (reader.Backwards ? -1 : 0));
+        result = parentTransform.TransformDirection(result);
         result.Normalize();
+        return result;
 
-
-        throw new NotImplementedException();
     }
 
     private void ApplyFriction(float fMultiplier)
