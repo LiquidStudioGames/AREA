@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovementFixed : MonoBehaviour
 {
+
 
     [SerializeField]
     private LayerMask groundCollision;
@@ -31,7 +31,7 @@ public class PlayerMovement : MonoBehaviour
     private float playerHeight;
     private Vector3 playerVelocity = Vector3.zero;
     private Vector3 playerDireccion = Vector3.zero;
-    private float groundSmooth = 0.1f; //Extra distance to smooth out rough terrain
+    private float groundSmooth = 0f; //Extra distance to smooth out rough terrain
     private CharacterController chController; //will be used for caracter collision
     private IPlayerInput reader;
     private bool wishJump;
@@ -47,11 +47,13 @@ public class PlayerMovement : MonoBehaviour
         chController = GetComponentInParent<CharacterController>();
         playerHeight = chController.bounds.extents.y;
         parentTransform = GetComponentInParent<Transform>();
-        
+
     }
 
     // Update is called once per frame
-    private void Update()
+
+
+    private void FixedUpdate()
     {
         /* Debug part of the code */
         Debug.DrawRay(transform.position, -transform.up * (playerHeight + groundSmooth), Color.red);
@@ -61,12 +63,13 @@ public class PlayerMovement : MonoBehaviour
         if (IsGrounded())
         {
             GroundMove();
-        } else 
+        }
+        else
         {
             AirMove();
         }
 
-        chController.Move(playerVelocity * Time.deltaTime);
+        chController.Move(playerVelocity * Time.fixedDeltaTime);
 
     }
 
@@ -93,7 +96,7 @@ public class PlayerMovement : MonoBehaviour
         float wishSpeed2 = wishSpeed;
 
         //if the player is only strafing
-        if(reader.Forward && reader.Backwards)
+        if (reader.Forward && reader.Backwards)
         {
             if (wishSpeed > sideStrafeSpeed) wishSpeed = sideStrafeSpeed;
 
@@ -104,12 +107,13 @@ public class PlayerMovement : MonoBehaviour
         if (airControl > 0)
             AirControl(wishDir, wishSpeed2);
 
-        if(playerVelocity.y < 0)
+        if (playerVelocity.y < 0)
         {
-            playerVelocity.y -= gravity * Time.deltaTime * downGravityMultiplier;
-        } else
+            playerVelocity.y -= gravity * Time.fixedDeltaTime * downGravityMultiplier;
+        }
+        else
         {
-            playerVelocity.y -= gravity * Time.deltaTime;
+            playerVelocity.y -= gravity * Time.fixedDeltaTime;
         }
     }
 
@@ -135,7 +139,7 @@ public class PlayerMovement : MonoBehaviour
 
         dot = Vector3.Dot(playerVelocity, wishdir);
         k = 32;
-        k *= airControl * dot * dot * Time.deltaTime;
+        k *= airControl * dot * dot * Time.fixedDeltaTime;
 
         // Change direction while slowing down
         if (dot > 0)
@@ -169,12 +173,12 @@ public class PlayerMovement : MonoBehaviour
 
 
         //Resets gravity velocity if grounded
-        playerVelocity.y = -gravity * Time.deltaTime;
+        playerVelocity.y = -gravity * Time.fixedDeltaTime;
 
         if (wishJump)
         {
             playerVelocity.y = jumpSpeed;
-            wishJump = false;         
+            wishJump = false;
         }
 
     }
@@ -191,7 +195,7 @@ public class PlayerMovement : MonoBehaviour
         if (addSpeed <= 0)
             return;
 
-        accelSpeed = accel * Time.deltaTime * wishSpeed;
+        accelSpeed = accel * Time.fixedDeltaTime * wishSpeed;
         if (accelSpeed >= addSpeed)
             accelSpeed = addSpeed;
 
@@ -235,7 +239,7 @@ public class PlayerMovement : MonoBehaviour
         if (IsGrounded())
         {
             control = speed < runDeacceleration ? runDeacceleration : speed;
-            drop = control * friction * Time.deltaTime * fMultiplier;
+            drop = control * friction * Time.fixedDeltaTime * fMultiplier;
         }
 
         newspeed = speed - drop;
@@ -270,7 +274,7 @@ public class PlayerMovement : MonoBehaviour
         {
             wishJump = false;
         }
-            
+
     }
 
 
@@ -279,8 +283,13 @@ public class PlayerMovement : MonoBehaviour
     /// </returns>
     private bool IsGrounded()
     {
+        if(Physics.Raycast(transform.position, -transform.up, playerHeight, groundCollision))
+        {
+            Debug.Log("player is grounded");
+            return true;
 
-        return Physics.Raycast(transform.position, -transform.up, playerHeight+groundSmooth, groundCollision);
+        }
+        return false;
 
     }
 

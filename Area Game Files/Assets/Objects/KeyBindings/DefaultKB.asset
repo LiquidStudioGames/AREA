@@ -17,4 +17,4 @@ MonoBehaviour:
   Forward: 119
   Backwards: 115
   StrafeLeft: 97
-  StrafeRight: 98
+  StrafeRight: 100
