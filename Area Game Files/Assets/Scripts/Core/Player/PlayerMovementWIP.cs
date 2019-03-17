@@ -78,12 +78,15 @@ public class PlayerMovementWIP : MonoBehaviour
         throw new NotImplementedException();
     }
 
+
     private void GroundMove()
     {
         // only apply friction if the player is not queuing a jump
         if (!wishJump)
         {
             ApplyFriction(1f);
+            if (groundSmooth == 0)
+                groundSmooth = 0.1f;
         }
 
         moveDirNorm = DesireDirection();
@@ -92,20 +95,37 @@ public class PlayerMovementWIP : MonoBehaviour
         Accelerate(DesireDirection(), wishSpeed, runAcceleration);
 
 
-        //Resets gravity if grounded
+        //Resets gravity velocity if grounded
         playerVelocity.y = -gravity * Time.deltaTime;
 
         if (wishJump)
         {
             playerVelocity.y = jumpSpeed;
             wishJump = false;
+            groundSmooth = 0;
         }
 
     }
 
-    private void Accelerate(Vector3 vector3, float wishSpeed, float runAcceleration)
+
+
+    private void Accelerate(Vector3 wishDir, float wishSpeed, float accel)
     {
-        throw new NotImplementedException();
+
+        float addSpeed, accelSpeed, currentSpeed;
+
+        currentSpeed = Vector3.Dot(playerVelocity, wishDir);
+        addSpeed = wishSpeed - currentSpeed;
+        if (addSpeed <= 0)
+            return;
+
+        accelSpeed = accel * Time.deltaTime * wishSpeed;
+        if (accelSpeed >= addSpeed)
+            accelSpeed = addSpeed;
+
+        playerVelocity.x += wishDir.x * accelSpeed;
+        playerVelocity.y += wishDir.y * accelSpeed;
+
     }
 
 
