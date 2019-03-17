@@ -40,7 +40,7 @@ public class PlayerMovementWIP : MonoBehaviour
 
 
     // Awake is called when object is enabled
-    void Awake()
+    private void Awake()
     {
         reader = GetComponent<IPlayerInput>();
         chController = GetComponentInParent<CharacterController>();
@@ -50,7 +50,7 @@ public class PlayerMovementWIP : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         /* Debug part of the code */
         Debug.DrawRay(transform.position, -transform.up * (playerHeight + groundSmooth), Color.red);
@@ -71,9 +71,86 @@ public class PlayerMovementWIP : MonoBehaviour
 
     private void AirMove()
     {
-        throw new NotImplementedException();
+        float wishVel = airAcceleration;
+        float accel;
+        Vector3 wishDir;
+
+        wishDir = DesireDirection();
+
+        float wishSpeed = wishDir.magnitude;
+        wishSpeed *= baseSpeed;
+
+        wishDir.Normalize();
+        moveDirNorm = wishDir;
+
+        //start AirControl part
+        if (Vector3.Dot(playerVelocity, wishDir) < 0)
+            accel = airDecceleration;
+        else
+            accel = airAcceleration;
+
+        float wishSpeed2 = wishSpeed;
+
+        //if the player is only strafing
+        if(reader.Forward && reader.Backwards)
+        {
+            if (wishSpeed > sideStrafeSpeed) wishSpeed = sideStrafeSpeed;
+
+            accel = sideStrafeAcceleration;
+        }
+
+        Accelerate(wishDir, wishSpeed, accel);
+        if (airControl > 0)
+            AirControl(wishDir, wishSpeed2);
+
+        if(playerVelocity.y < 0)
+        {
+            playerVelocity.y -= gravity * Time.deltaTime * downGravityMultiplier;
+        } else
+        {
+            playerVelocity.y -= gravity * Time.deltaTime;
+        }
     }
 
+    /// <summary>
+    /// Straight up copied from https://github.com/WiggleWizard/quake3-movement-unity3d/blob/master/CPMPlayer.cs#L149 not feeling that sure for it
+    /// </summary>
+
+    private void AirControl(Vector3 wishdir, float wishspeed)
+    {
+        float zspeed;
+        float speed;
+        float dot;
+        float k;
+
+        // Can't control movement if not moving forward or backward
+        if (reader.Forward || reader.Backwards || Mathf.Abs(wishspeed) < 0.001)
+            return;
+        zspeed = playerVelocity.y;
+        playerVelocity.y = 0;
+        /* Next two lines are equivalent to idTech's VectorNormalize() */
+        speed = playerVelocity.magnitude;
+        playerVelocity.Normalize();
+
+        dot = Vector3.Dot(playerVelocity, wishdir);
+        k = 32;
+        k *= airControl * dot * dot * Time.deltaTime;
+
+        // Change direction while slowing down
+        if (dot > 0)
+        {
+            playerVelocity.x = playerVelocity.x * speed + wishdir.x * k;
+            playerVelocity.y = playerVelocity.y * speed + wishdir.y * k;
+            playerVelocity.z = playerVelocity.z * speed + wishdir.z * k;
+
+            playerVelocity.Normalize();
+            moveDirNorm = playerVelocity;
+        }
+
+        playerVelocity.x *= speed;
+        playerVelocity.y = zspeed; // Note this line
+        playerVelocity.z *= speed;
+    }
 
     private void GroundMove()
     {
@@ -81,11 +158,10 @@ public class PlayerMovementWIP : MonoBehaviour
         if (!wishJump)
         {
             ApplyFriction(1f);
-            if (groundSmooth == 0)
-                groundSmooth = 0.1f;
         }
 
         moveDirNorm = DesireDirection();
+        moveDirNorm.Normalize();
         wishSpeed = moveDirNorm.magnitude;
         wishSpeed *= baseSpeed;
         Accelerate(moveDirNorm, wishSpeed, runAcceleration);
@@ -97,8 +173,7 @@ public class PlayerMovementWIP : MonoBehaviour
         if (wishJump)
         {
             playerVelocity.y = jumpSpeed;
-            wishJump = false;
-            groundSmooth = 0;
+            wishJump = false;         
         }
 
     }
@@ -134,7 +209,6 @@ public class PlayerMovementWIP : MonoBehaviour
 
         Vector3 result = new Vector3((reader.Right ? 1 : 0) + (reader.Left ? -1 : 0), 0, (reader.Forward ? 1 : 0) + (reader.Backwards ? -1 : 0));
         result = parentTransform.TransformDirection(result);
-        result.Normalize();
         return result;
 
     }
