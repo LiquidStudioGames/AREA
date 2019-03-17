@@ -1726,16 +1726,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   address: 127.0.0.1
-  port: 4297
+  port: 4296
   ipVersion: 0
   autoConnect: 0
   invokeFromDispatcher: 1
   sniffData: 0
-  maxCachedWriters: 2
-  maxCachedReaders: 2
-  maxCachedMessages: 8
-  maxCachedSocketAsyncEventArgs: 32
-  maxCachedActionDispatcherTasks: 16
+  objectCacheSettings:
+    maxWriters: 2
+    maxReaders: 2
+    maxMessages: 4
+    maxMessageBuffers: 4
+    maxSocketAsyncEventArgs: 32
+    maxActionDispatcherTasks: 16
+    maxAutoRecyclingArrays: 4
+    extraSmallMemoryBlockSize: 16
+    maxExtraSmallMemoryBlocks: 2
+    smallMemoryBlockSize: 64
+    maxSmallMemoryBlocks: 2
+    mediumMemoryBlockSize: 256
+    maxMediumMemoryBlocks: 2
+    largeMemoryBlockSize: 1024
+    maxLargeMemoryBlocks: 2
+    extraLargeMemoryBlockSize: 4096
+    maxExtraLargeMemoryBlocks: 2
 --- !u!4 &629299396
 Transform:
   m_ObjectHideFlags: 0
