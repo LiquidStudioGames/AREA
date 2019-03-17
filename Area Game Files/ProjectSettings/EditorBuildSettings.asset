@@ -14,16 +14,16 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Testing/SampleScene.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
-  - enabled: 1
-    path: Assets/Scenes/Official/Login.unity
-    guid: 3e64130642e16cc4bb1366de61e2a9b5
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
   - enabled: 1
     path: Assets/Scenes/Official/Menu.unity
     guid: 52054ad4747d89c4096ac86c02ea4d10
-  - enabled: 1
-    path: Assets/Scenes/Official/Settings.unity
-    guid: 10e18e34918f7154eb3354dcff8ada76
-  - enabled: 1
-    path: Assets/Scenes/Official/PlayerServers.unity
-    guid: aa03d7490643e72428fccf1c6deba78b
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
   m_configObjects: {}
