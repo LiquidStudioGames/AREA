@@ -18,20 +18,31 @@ namespace DarkRift.Client.Unity
         SerializedProperty invokeFromDispatcher;
         SerializedProperty sniffData;
 
-        SerializedProperty objectCacheSettings;
+        SerializedProperty maxCachedWriters;
+        SerializedProperty maxCachedReaders;
+        SerializedProperty maxCachedMessages;
+        SerializedProperty maxCachedSocketAsyncEventArgs;
+        SerializedProperty maxCachedActionDispatcherTasks;
+
+        bool showCache;
 
         void OnEnable()
         {
             client = ((UnityClient)serializedObject.targetObject);
 
-            address                 = client.Address.ToString();
-            port                    = serializedObject.FindProperty("port");
-            ipVersion               = serializedObject.FindProperty("ipVersion");
-            autoConnect             = serializedObject.FindProperty("autoConnect");
-            invokeFromDispatcher    = serializedObject.FindProperty("invokeFromDispatcher");
-            sniffData               = serializedObject.FindProperty("sniffData");
+            address     = client.Address.ToString();
+            port        = serializedObject.FindProperty("port");
+            ipVersion   = serializedObject.FindProperty("ipVersion");
+            autoConnect = serializedObject.FindProperty("autoConnect");
+            invokeFromDispatcher
+                        = serializedObject.FindProperty("invokeFromDispatcher");
+            sniffData   = serializedObject.FindProperty("sniffData");
 
-            objectCacheSettings     = serializedObject.FindProperty("objectCacheSettings");
+            maxCachedWriters = serializedObject.FindProperty("maxCachedWriters");
+            maxCachedReaders = serializedObject.FindProperty("maxCachedReaders");
+            maxCachedMessages = serializedObject.FindProperty("maxCachedMessages");
+            maxCachedSocketAsyncEventArgs = serializedObject.FindProperty("maxCachedSocketAsyncEventArgs");
+            maxCachedActionDispatcherTasks = serializedObject.FindProperty("maxCachedActionDispatcherTasks");
         }
 
         public override void OnInspectorGUI()
@@ -74,7 +85,14 @@ namespace DarkRift.Client.Unity
 
             EditorGUILayout.PropertyField(sniffData);
             
-            EditorGUILayout.PropertyField(objectCacheSettings, true);
+            if (showCache = EditorGUILayout.Foldout(showCache, "Cache"))
+            {
+                EditorGUILayout.PropertyField(maxCachedWriters);
+                EditorGUILayout.PropertyField(maxCachedReaders);
+                EditorGUILayout.PropertyField(maxCachedMessages);
+                EditorGUILayout.PropertyField(maxCachedSocketAsyncEventArgs);
+                EditorGUILayout.PropertyField(maxCachedActionDispatcherTasks);
+            }
 
             serializedObject.ApplyModifiedProperties();
         }

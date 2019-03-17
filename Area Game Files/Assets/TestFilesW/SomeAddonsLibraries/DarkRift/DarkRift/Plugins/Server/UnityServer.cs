@@ -330,10 +330,7 @@ namespace DarkRift.Server.Unity
 
             //Server settings
             spawnData.Server.MaxStrikes = maxStrikes;
-            //This is an obsolete property but is still used if the user is using obsolete Server properties as we are
-#pragma warning disable 0618
             spawnData.Server.UseFallbackNetworking = true;      //Unity is broken, work around it...
-#pragma warning restore 0618
             spawnData.EventsFromDispatcher = eventsFromDispatcher;
 
             //Plugin search settings

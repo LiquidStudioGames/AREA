@@ -61,78 +61,81 @@ namespace DarkRift.Client.Unity
         volatile bool sniffData = false;
 
         #region Cache settings
-        #region Legacy
+
         /// <summary>
         ///     The maximum number of <see cref="DarkRiftWriter"/> instances stored per thread.
         /// </summary>
-        [Obsolete("Use the ObjectCahceSettings property instead.")]
         public int MaxCachedWriters
         {
             get
             {
-                return ObjectCacheSettings.MaxWriters;
+                return maxCachedWriters;
             }
         }
+
+        [SerializeField]
+        [Tooltip("The maximum number of DarkRiftWriter instances stored per thread.")]
+        int maxCachedWriters = 2;
 
         /// <summary>
         ///     The maximum number of <see cref="DarkRiftReader"/> instances stored per thread.
         /// </summary>
-        [Obsolete("Use the ObjectCahceSettings property instead.")]
         public int MaxCachedReaders
         {
             get
             {
-                return ObjectCacheSettings.MaxReaders;
+                return maxCachedReaders;
             }
         }
+
+        [SerializeField]
+        [Tooltip("The maximum number of DarkRiftReader instances stored per thread.")]
+        int maxCachedReaders = 2;
 
         /// <summary>
         ///     The maximum number of <see cref="Message"/> instances stored per thread.
         /// </summary>
-        [Obsolete("Use the ObjectCahceSettings property instead.")]
         public int MaxCachedMessages
         {
             get
             {
-                return ObjectCacheSettings.MaxMessages;
+                return maxCachedMessages;
             }
         }
+
+        [SerializeField]
+        [Tooltip("The maximum number of Message instances stored per thread.")]
+        int maxCachedMessages = 8;
 
         /// <summary>
         ///     The maximum number of <see cref="System.Net.Sockets.SocketAsyncEventArgs"/> instances stored per thread.
         /// </summary>
-        [Obsolete("Use the ObjectCahceSettings property instead.")]
         public int MaxCachedSocketAsyncEventArgs
         {
             get
             {
-                return ObjectCacheSettings.MaxSocketAsyncEventArgs;
+                return maxCachedSocketAsyncEventArgs;
             }
         }
+
+        [SerializeField]
+        [Tooltip("The maximum number of SocketAsyncEventArgs instances stored per thread.")]
+        int maxCachedSocketAsyncEventArgs = 32;
 
         /// <summary>
         ///     The maximum number of <see cref="ActionDispatcherTask"/> instances stored per thread.
         /// </summary>
-        [Obsolete("Use the ObjectCahceSettings property instead.")]
         public int MaxCachedActionDispatcherTasks
         {
             get
             {
-                return ObjectCacheSettings.MaxActionDispatcherTasks;
+                return maxCachedActionDispatcherTasks;
             }
         }
-        #endregion Legacy
-
-        /// <summary>
-        ///     The object cache settings in use.
-        /// </summary>
-        public ObjectCacheSettings ObjectCacheSettings { get; set; }
-
-        /// <summary>
-        ///     Serialisable version of the object cache settings for Unity.
-        /// </summary>
+        
         [SerializeField]
-        SerializableObjectCacheSettings objectCacheSettings = new SerializableObjectCacheSettings();
+        [Tooltip("The maximum number of ActionDispatcherTask instances stored per thread.")]
+        int maxCachedActionDispatcherTasks = 16;
         #endregion
 
         /// <summary>
@@ -159,7 +162,6 @@ namespace DarkRift.Client.Unity
         /// <summary>
         ///     Returns whether or not this client is connected to the server.
         /// </summary>
-        [Obsolete("User ConnectionState instead.")]
         public bool Connected
         {
             get
@@ -168,22 +170,10 @@ namespace DarkRift.Client.Unity
             }
         }
 
-
-        /// <summary>
-        ///     Returns the state of the connection with the server.
-        /// </summary>
-        public ConnectionState ConnectionState
-        {
-            get
-            {
-                return Client.ConnectionState;
-            }
-        }
-
-        /// <summary>
-        /// 	The actual client connecting to the server.
-        /// </summary>
-        /// <value>The client.</value>
+		/// <summary>
+		/// 	The actual client connecting to the server.
+		/// </summary>
+		/// <value>The client.</value>
         public DarkRiftClient Client
         {
             get
@@ -201,9 +191,7 @@ namespace DarkRift.Client.Unity
         
         void Awake()
         {
-            ObjectCacheSettings = objectCacheSettings.ToObjectCacheSettings();
-
-            client = new DarkRiftClient(ObjectCacheSettings);
+            client = new DarkRiftClient(maxCachedWriters, maxCachedReaders, maxCachedMessages, maxCachedSocketAsyncEventArgs, maxCachedActionDispatcherTasks);
 
             //Setup dispatcher
             Dispatcher = new Dispatcher(true);
@@ -230,12 +218,14 @@ namespace DarkRift.Client.Unity
         {
             //Remove resources
             Close();
+            Debug.Log("Destroy");
         }
 
         void OnApplicationQuit()
         {
             //Remove resources
             Close();
+            Debug.Log("Quit");
         }
 
         /// <summary>
@@ -247,7 +237,7 @@ namespace DarkRift.Client.Unity
         {
             Client.Connect(ip, port, ipVersion);
 
-            if (ConnectionState == ConnectionState.Connected)
+            if (Connected)
                 Debug.Log("Connected to " + ip + " on port " + port + " using " + ipVersion + ".");
             else
                 Debug.Log("Connection failed to " + ip + " on port " + port + " using " + ipVersion + ".");
@@ -275,7 +265,7 @@ namespace DarkRift.Client.Unity
                             callback.Invoke(e);
                     }
                     
-                    if (ConnectionState == ConnectionState.Connected)
+                    if (Connected)
                         Debug.Log("Connected to " + ip + " on port " + port + " using " + ipVersion + ".");
                     else
                         Debug.Log("Connection failed to " + ip + " on port " + port + " using " + ipVersion + ".");
@@ -306,9 +296,6 @@ namespace DarkRift.Client.Unity
                 if (sniffData)
                     Debug.Log("Message Received");      //TODO more information!
 
-                // DarkRift will recycle our object if we don't get a reference to the message so open one now and clear after processing
-                Message message = e.GetMessage();
-
                 Dispatcher.InvokeAsync(
                     () => 
                         {
@@ -317,8 +304,6 @@ namespace DarkRift.Client.Unity
                             {
                                 handler.Invoke(sender, e);
                             }
-
-                            message.Dispose();
                         }
                 );
             }

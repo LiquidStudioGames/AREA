@@ -44,8 +44,9 @@ namespace Dim
                 uC = value;
 
                 np = FindObjectOfType<NetworkPlayerDimManager>();
-                uC.MessageReceived += MessageTimeRecive;
+                
                 clientId = uC.ID;
+                uC.MessageReceived += MessageTimeRecive;
             }
         }
 

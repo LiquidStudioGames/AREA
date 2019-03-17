@@ -292,6 +292,7 @@ namespace Dim
         public void RemoveBody()
         {
             space.Remove(spherChar);
+            
             Console.WriteLine("Usuniety");
         }
 

@@ -251,9 +251,12 @@ namespace Dim
                 WeaponBreak.pistolBreakStep
                 );
 
+
+           // Console.WriteLine(e.Client + "    " + e.Client.ID);
+
             using (DarkRiftWriter newPlayerWriter = DarkRiftWriter.Create())
             {
-                newPlayerWriter.Write(pI.ID);
+                newPlayerWriter.Write(e.Client.ID);
                 //newPlayerWriter.Write(pI.moveHorizontal);
                 //newPlayerWriter.Write(pI.moveVertical);
                 //newPlayerWriter.Write(pI.shoot);
@@ -263,12 +266,15 @@ namespace Dim
                 newPlayerWriter.Write(pI.posZ);
 
                 //newPlayerWriter.Write(pI.rot);
-
+                
                 // players.Add(e.Client, pI);
                 using (Message newPlayerMessage = Message.Create(DimTag.SpawnPlayerTag, newPlayerWriter))
                 {
                     foreach (IClient client in ClientManager.GetAllClients().Where(x => x != e.Client))
+                    {
                         client.SendMessage(newPlayerMessage, SendMode.Reliable);
+                        Console.WriteLine(client.ID + "   wyslane");
+                    }
                 }
             }
 
@@ -289,7 +295,10 @@ namespace Dim
                     // playerWriter.Write(pI.rot);
                 }
                 using (Message playerMessage = Message.Create(DimTag.SpawnPlayerTag, playerWriter))
+                {
                     e.Client.SendMessage(playerMessage, SendMode.Reliable);
+                    Console.WriteLine(e.Client.ID + "   do wchodzącego");
+                }
             }
 
             e.Client.MessageReceived += MovementMessageReceived;
@@ -373,16 +382,14 @@ namespace Dim
                                 writer.Write(helpPlayerInput.posY);
                                 writer.Write(helpPlayerInput.posZ);
                                 writer.Write(helpPlayerInput.GetLastCalculatedStep());
+                                writer.Write(time);
                                 writer.Write(moveHor);
                                 writer.Write(moveVer);
                                 writer.Write(rotYaw);
                                 writer.Write(rotPitch);
                                 writer.Write(jump);
                                 writer.Write(shoot);
-
-                                writer.Write(helpPlayerInput.GetLastShootStep());
-
-                                writer.Write(time);
+                                writer.Write(helpPlayerInput.GetLastShootStep());    
                                 writer.Write(st);
                                
                                 message.Serialize(writer);
@@ -439,9 +446,7 @@ namespace Dim
         void ClientDisconnected(object sender, ClientDisconnectedEventArgs e)
         {
            //Console.WriteLine("Usuwam");
-            players[e.Client].RemoveBody();
-            players.Remove(e.Client);
-            Console.WriteLine("Klient usuniety");
+ 
 
             using (DarkRiftWriter writer = DarkRiftWriter.Create())
             {
@@ -453,6 +458,10 @@ namespace Dim
                         client.SendMessage(message, SendMode.Reliable);
                 }
             }
+
+            players[e.Client].RemoveBody();
+            players.Remove(e.Client);
+            Console.WriteLine("Klient usuniety");
         }
 
 

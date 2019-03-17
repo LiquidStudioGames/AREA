@@ -240,7 +240,7 @@ namespace Dim
         //    Destroy(lineRend.gameObject, .2f);
         //}
 
-        void FillIfExistNotOwner(ushort step, float posX, float posY, float posZ, float moveX, float moveY, float rotYaw, float rotPitch, ushort lastShootStep, ushort st, bool shoot, float time)
+        void FillIfExistNotOwner(ushort step, float posX, float posY, float posZ, float moveX, float moveY, float rotYaw, float rotPitch, ushort lastShootStep, ushort st, bool shoot, bool jump, float time)
         {
         //    for (int i = 0; i < data.Length; i++)
                // if (data[i].step == step)
@@ -306,9 +306,9 @@ namespace Dim
             FillIfExist(calcStep, posX, posY, posZ, time);
         }
 
-        public void ReciveOtherPlayerMessage(ushort calcStep, float posX, float posY, float posZ, float moveX, float moveY, float rotYaw, float rotPitch, ushort lastShootSte, ushort step,bool shoot, float time)
+        public void ReciveOtherPlayerMessage(ushort calcStep, float posX, float posY, float posZ, float moveX, float moveY, float rotYaw, float rotPitch, ushort lastShootSte, ushort step,bool shoot, bool jump, float time)
         {
-            FillIfExistNotOwner(calcStep, posX, posY, posZ,moveX, moveY, rotYaw, rotPitch,lastShootSte, step, shoot,time);
+            FillIfExistNotOwner(calcStep, posX, posY, posZ,moveX, moveY, rotYaw, rotPitch,lastShootSte, step, shoot, jump,time);
         }
 
 

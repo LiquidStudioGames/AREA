@@ -5,19 +5,19 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Testing/MainTestScene.unity
     guid: 61fda8758a3ed8c48b89ac39eabf6730
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Testing/GameTestScene.unity
     guid: bdaaca72d452cc74bb814b42b312ce7d
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Testing/SampleScene.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
   - enabled: 0
     path: 
     guid: 00000000000000000000000000000000
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Official/Menu.unity
     guid: 52054ad4747d89c4096ac86c02ea4d10
   - enabled: 0
@@ -26,4 +26,10 @@ EditorBuildSettings:
   - enabled: 0
     path: 
     guid: 00000000000000000000000000000000
+  - enabled: 1
+    path: Assets/TestFilesW/bepuMyResolution/Scenes/Menu.unity
+    guid: 4cae368bb16cc134a804f37114cc4544
+  - enabled: 0
+    path: Assets/TestFilesW/SomeAddonsLibraries/DarkRift/3 BlockDemo/BlockDemo.unity
+    guid: 03a1c5ab7b1408e4a9b3b7905b184093
   m_configObjects: {}

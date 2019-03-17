@@ -174,7 +174,7 @@ namespace Dim
             space = new BEPUphysics.Space();
             space.ForceUpdater.Gravity = new BEPUutilities.Vector3(0, -10f, 0);
             AddCollidersToWorld(obj);
-            client.MessageReceived += MessageReceived;
+            client.MessageReceived += CleneMessageReveiveMessageReceived;
         }
 
 
@@ -232,62 +232,68 @@ namespace Dim
             ownerId = id;
         }
 
-        void MessageReceived(object sender, MessageReceivedEventArgs e)
+        void CleneMessageReveiveMessageReceived(object sender, MessageReceivedEventArgs e)
         {
+
+            //using (Message message = e.GetMessage() as Message)
+            //{
+            //    //Check the message has a zero tag
+            //    if (message.Tag == MOVE_TAG)
+            //    {
+            //        //Get the reader from the message so we can read the data
+            //        using (DarkRiftReader reader = message.GetReader())
+            //        {
+            //            //If it's for us...
+            //            if (reader.ReadByte() == dragID)
+            //            {
+            //                //... then update our position!
+            //                targetPosition = new Vector3(reader.ReadSingle(), reader.ReadSingle(), 0);
+            //            }
+            //        }
+            //    }
+            //}
             using (Message message = e.GetMessage() as Message)
             {
 
                 //Debug.Log("message " + message.Tag);
+                if(networkPlayers.Count > 0)
                 if (message.Tag == DimTag.MovePlayerTag)
                 {
                     using (DarkRiftReader reader = message.GetReader())
                     {
                         ushort id = reader.ReadUInt16();
-
-                        //Vector3 newPosition = new Vector3(reader.ReadSingle(), reader.ReadSingle(), 0);
-
-                        if (networkPlayers.ContainsKey(id))
                         {
+                                if (id == ownerId)
+                                {
+                                    float calcPositionX = reader.ReadSingle();
+                                    float calcPositionY = reader.ReadSingle();
+                                    float calcPositionZ = reader.ReadSingle();
+                                    ushort lastCalculatedStep = reader.ReadUInt16();
+                                    float time = reader.ReadSingle();
+                                    tr.position = new Vector3(calcPositionX, calcPositionY, calcPositionZ);
+                                    if (networkPlayers.ContainsKey(id))
+                                        networkPlayers[id].ReciveOwnerMessage(lastCalculatedStep, calcPositionX, calcPositionY, calcPositionZ, time);
+                                }
+                                else
+                                {
+                                    float calcPositionX = reader.ReadSingle();
+                                    float calcPositionY = reader.ReadSingle();
+                                    float calcPositionZ = reader.ReadSingle();
+                                    ushort lastCalculatedStep = reader.ReadUInt16();
+                                    float time = reader.ReadSingle();
+                                    float moveX = reader.ReadSingle();
+                                    float moveY = reader.ReadSingle();
+                                    float rotYaw = reader.ReadSingle();
+                                    float rotPitch = reader.ReadSingle();
+                                    bool jump = reader.ReadBoolean();
+                                    bool shoot = reader.ReadBoolean();
+                                    ushort lastShootStep = reader.ReadUInt16();
+                                    ushort step = reader.ReadUInt16();
 
-                            //pozycja jest z czasu interpolacji 
-                            float calcPositionX = reader.ReadSingle();
-                            float calcPositionY = reader.ReadSingle();
-                            float calcPositionZ = reader.ReadSingle();
-                            ushort lastCalculatedStep = reader.ReadUInt16();
-
-
-
-
-                            //a reszta jest z ostatnio przesłanego czasu
-
-                            //networkPlayers[id].SetPosition(calcPositionX, calcPositionY);
-
-                            if (id == ownerId)
-                            {
-
-                                float time = reader.ReadSingle();
-                                tr.position = new Vector3(calcPositionX, calcPositionY, calcPositionZ);
-                                //dupa
-                                networkPlayers[id].ReciveOwnerMessage(lastCalculatedStep, calcPositionX, calcPositionY, calcPositionZ, time);
-                               // networkPlayers[id].SetDelayTime(reader.ReadSingle());
-                               // networkPlayers[id].SetLastPlayerStep(reader.ReadUInt16());
-                            }
-                            else
-                            {
-                                float moveX = reader.ReadSingle();
-                                float moveY = reader.ReadSingle();
-                                float rotYaw = reader.ReadSingle();
-                                float rotPitch = reader.ReadSingle();
-                                bool jump = reader.ReadBoolean();
-                                bool shoot = reader.ReadBoolean();
-                                ushort lastShootStep = reader.ReadUInt16();
-                                float time = reader.ReadSingle();
-                                //krok jest z czasu interpolacji
-                                ushort step = reader.ReadUInt16();
-
-                                networkPlayers[id].ReciveOtherPlayerMessage(step, calcPositionX, calcPositionY, calcPositionZ,  moveX, moveY, rotYaw, rotPitch, lastShootStep,step,shoot, time);
-                                //networkPlayers[id].SetDelayTimeForOther(reader.ReadSingle(), reader.ReadUInt16());
-                            }
+                                    if (networkPlayers.ContainsKey(id))
+                                        networkPlayers[id].ReciveOtherPlayerMessage(step, calcPositionX, calcPositionY, calcPositionZ, moveX, moveY, rotYaw, rotPitch, lastShootStep, step, shoot, jump, time);
+                                    //networkPlayers[id].SetDelayTimeForOther(reader.ReadSingle(), reader.ReadUInt16());
+                                }
                         }
                     }
                 }
@@ -322,12 +328,16 @@ namespace Dim
 
         public void DestroyPlayer(ushort id)
         {
-            SetPositionFromServer o = networkPlayers[id];
-            o.DestroyBody();
+            if (networkPlayers.ContainsKey(id))
+            {
+                GameObject gob =  networkPlayers[id].gameObject;
+                // o.DestroyBody();
 
-            Destroy(o.gameObject);
 
-            networkPlayers.Remove(id);
+                Debug.Log("Usuwam gracza " + id);
+                networkPlayers.Remove(id);
+                Destroy(gob);
+            }
         }
     }
 }

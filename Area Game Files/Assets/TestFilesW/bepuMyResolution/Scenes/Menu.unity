@@ -1356,6 +1356,7 @@ MonoBehaviour:
     type: 3}
   networkPlayeDimrManager: {fileID: 629299393}
   startPacketLength: 14
+  maxOtherPlayers: 15
   playerRadius: 1
 --- !u!114 &629299395
 MonoBehaviour:

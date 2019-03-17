@@ -31,8 +31,23 @@ namespace Dim
         public int startPacketLength = 14;
 
 
+        GameObject playerGob;
+        GameObject[] otherPlayer;
+        int lastOtherPlayerUse = 0;
+        public int maxOtherPlayers = 15;
+
         void Awake()
         {
+            playerGob = Instantiate(controllablePrefab, UnityEngine.Vector3.zero, UnityEngine.Quaternion.identity) as GameObject;
+            playerGob.SetActive(false);
+
+            otherPlayer = new GameObject[maxOtherPlayers];
+            for (int i = 0; i < maxOtherPlayers; i++)
+            {
+                otherPlayer[i] = Instantiate(networkPrefab, UnityEngine.Vector3.zero, UnityEngine.Quaternion.identity) as GameObject;
+                otherPlayer[i].SetActive(false);
+            }
+
             if (client == null)
             {
                 Debug.LogError("Client unassigned in PlayerSpawner.");
@@ -53,12 +68,12 @@ namespace Dim
 
             //automatic connection to server
            // client.Connect(client.Address, client.Port, client.IPVersion);
-            client.MessageReceived += MessageReceived;
+            client.MessageReceived += MessageReceivedStart;
         }
 
 
 
-        void MessageReceived(object sender, MessageReceivedEventArgs e)
+        void MessageReceivedStart(object sender, MessageReceivedEventArgs e)
         {
             using (Message message = e.GetMessage() as Message)
             {
@@ -138,7 +153,9 @@ namespace Dim
                             return;
                         }
 
-                        //Debug.Log(reader.Length);
+                      //  Debug.LogError(reader.Length);
+
+                       // Debug.Log(reader.Length);
 
                         while (reader.Position < reader.Length)
                         {
@@ -156,37 +173,48 @@ namespace Dim
                             // 255
                             // );
 
-                            Debug.Log("Spawning client for ID = " + id + ".");
+                           // Debug.Log("Spawning client for ID = " + id + ".");
                             SetPositionFromServer ob;
                             GameObject obj;
                             if (id == client.ID)
                             {
-                                obj = Instantiate(controllablePrefab, position, UnityEngine.Quaternion.identity) as GameObject;
+                               // Debug.Log("instancjuje siebie");
+                                networkPlayeDimrManager.SetOwnerId(id);
 
-
+                                //Debug.Log("instancjuje siebie2");
 
                                 //Camera.main.GetComponent<CamFollow>().Target = obj.transform;
-                              //  Camera.main.transform.SetParent(obj.transform);
-                                networkPlayeDimrManager.SetOwnerId(id);
+                                //  Camera.main.transform.SetParent(obj.transform);
+
+                                 obj = Instantiate(controllablePrefab, position, UnityEngine.Quaternion.identity) as GameObject;
+                               // obj = playerGob;
                                 ob = obj.GetComponent<SetPositionFromServer>();
+                                //Debug.Log("instancjuje siebie3");
                                 // ob.InitBody(LocalCreateRigidBody(1f, Matrix.Identity), networkPlayeDimrManager.GetWorld);
-                               // BEPUphysics.Entities.Entity ent = AddPlayer(1, new BEPUphysics.CollisionShapes.ConvexShapes.SphereShape(1f));
+                                // BEPUphysics.Entities.Entity ent = AddPlayer(1, new BEPUphysics.CollisionShapes.ConvexShapes.SphereShape(1f));
                                 ob.InitBody(AddPlayer(false),
-                                    networkPlayeDimrManager.GetWorld); 
+                                    networkPlayeDimrManager.GetWorld);
+                               // Debug.Log("instancjuje siebie4");
                                 MoveControl player = obj.GetComponent<MoveControl>();
                                 player.Clientt = client;
-                                DeliveryDamageGameType typeGame = obj.GetComponent<DeliveryDamageGameType>();
-                                typeGame.Clientt = client;
+                               //DeliveryDamageGameType typeGame = obj.GetComponent<DeliveryDamageGameType>();
+                                //typeGame.Clientt = client;
+                                //playerGob.SetActive(true);
 
-
+                               // Debug.Log("Po instantacji");
                             }
                             else
                             {
+                               // Debug.Log("Instancjuje innego gracza");
                                 obj = Instantiate(networkPrefab, position, UnityEngine.Quaternion.identity) as GameObject;
+                                //obj = otherPlayer[lastOtherPlayerUse];
+                                //lastOtherPlayerUse++;
+
                                 ob = obj.GetComponent<SetPositionFromServer>();
                                // BEPUphysics.Entities.Entity ent = AddPlayer(0, new BEPUphysics.CollisionShapes.ConvexShapes.SphereShape(1f));
                                 ob.InitBody(AddPlayer(false),
                                    networkPlayeDimrManager.GetWorld);
+                                obj.SetActive(true);
                             }
 
                             
@@ -207,7 +235,9 @@ namespace Dim
         {
             using (Message message = e.GetMessage())
             using (DarkRiftReader reader = message.GetReader())
+            {
                 networkPlayeDimrManager.DestroyPlayer(reader.ReadUInt16());
+            }
         }
 
     }

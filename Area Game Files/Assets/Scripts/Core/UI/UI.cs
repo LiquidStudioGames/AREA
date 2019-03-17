@@ -28,7 +28,7 @@ public class UI : MonoBehaviour
     public void Quit ()
     {
 #if UNITY_EDITOR
-        EditorApplication.ExitPlaymode ();
+       // EditorApplication.ExitPlaymode ();
 #else
         Application.Quit();
 #endif

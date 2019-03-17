@@ -65,10 +65,7 @@ namespace DarkRift.Server.Unity
                 spawnData.EventsFromDispatcher = eventsFromDispatcher;
 
                 //Unity is broken, work around it...
-                //This is an obsolete property but is still used if the user is using obsolete <server> tag properties
-#pragma warning disable 0618
                 spawnData.Server.UseFallbackNetworking = true;
-#pragma warning restore 0618
 
                 //Add types
                 spawnData.PluginSearch.PluginTypes.AddRange(UnityServerHelper.SearchForPlugins());
