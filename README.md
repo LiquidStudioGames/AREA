@@ -8,9 +8,6 @@ This game is made in Unity with C#. Please don't publish the game files without 
 
 
 
-## AMC
+## Physic library tests
 
-AMC (AREA Mod Creator), is a seperate program that will make it easier for the users to create their own mods.
-
-Menu Mockup:
-![alt text](https://github.com/Dmunch04/fast-paced-fps--Area-/blob/master/Design/Mockups/Menu%20Design.png?raw=true)
+This is for now Bepuphysics 1 library test (the new one 2 version isn't compatybile with unity) + Darkrift client - server connection.  This is badly writed but for now this is only for test.
