@@ -65,11 +65,7 @@ public class PlayerMovementWIP : MonoBehaviour
             AirMove();
         }
 
-
-
-
-
-
+        chController.Move(playerVelocity * Time.deltaTime);
 
     }
 
@@ -92,7 +88,7 @@ public class PlayerMovementWIP : MonoBehaviour
         moveDirNorm = DesireDirection();
         wishSpeed = moveDirNorm.magnitude;
         wishSpeed *= baseSpeed;
-        Accelerate(DesireDirection(), wishSpeed, runAcceleration);
+        Accelerate(moveDirNorm, wishSpeed, runAcceleration);
 
 
         //Resets gravity velocity if grounded
@@ -124,7 +120,7 @@ public class PlayerMovementWIP : MonoBehaviour
             accelSpeed = addSpeed;
 
         playerVelocity.x += wishDir.x * accelSpeed;
-        playerVelocity.y += wishDir.y * accelSpeed;
+        playerVelocity.z += wishDir.z * accelSpeed;
 
     }
 
@@ -143,9 +139,40 @@ public class PlayerMovementWIP : MonoBehaviour
 
     }
 
+
+    /// <summary>
+    /// Apply friction function, not that sure about its implementation, got 2 ask 4 input
+    /// </summary>
+    /// <param name="fMultiplier"></param>
     private void ApplyFriction(float fMultiplier)
     {
-        throw new NotImplementedException();
+        Vector3 vec = playerVelocity; // Equivalent to: VectorCopy();
+        float speed;
+        float newspeed;
+        float control;
+        float drop;
+
+        vec.y = 0.0f;
+        speed = vec.magnitude;
+        drop = 0.0f;
+
+        /* Only if the player is on the ground then apply friction */
+        if (IsGrounded())
+        {
+            control = speed < runDeacceleration ? runDeacceleration : speed;
+            drop = control * friction * Time.deltaTime * fMultiplier;
+        }
+
+        newspeed = speed - drop;
+
+        if (newspeed < 0)
+            newspeed = 0;
+        if (speed > 0)
+            newspeed /= speed;
+
+        playerVelocity.x *= newspeed;
+        playerVelocity.z *= newspeed;
+
     }
 
 
