@@ -16,6 +16,7 @@ public class Game : MonoBehaviour
     public static Game Instance;
 
     public bool IsClient;
+    public string sceneToLoadName = "GameTestScene";
 
     public UI UI;
     public Settings Settings;
@@ -105,7 +106,19 @@ public class Game : MonoBehaviour
 
             // This is basically pressing 'Start Game' immediatly
             Steam.StartListen();
-            Steam.LoadLevel("GameTestScene");
+            Steam.LoadLevel(sceneToLoadName);
+        }
+
+        if (e == LobbyEvent.Left)
+        {
+            Debug.Log("Player left");
+
+        }
+
+        if (e == LobbyEvent.Updated)
+        {
+            Debug.Log("Lobby updated");
+
         }
     }
 }

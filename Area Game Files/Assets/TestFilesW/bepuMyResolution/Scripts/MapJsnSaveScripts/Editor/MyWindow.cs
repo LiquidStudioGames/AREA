@@ -50,9 +50,9 @@ namespace Dim
                 SaveJSONColliders jsonColl = new SaveJSONColliders(circleCol, boxCol);
 
 
-                string serialized = EditorJsonUtility.ToJson(jsonColl);// " ";//= Js//Json.JsonParser.Serialize(jsonColl);//  JsonConvert.SerializeObject(jsonColl);
+                //string serialized = EditorJsonUtility.ToJson(jsonColl);// " ";//= Js//Json.JsonParser.Serialize(jsonColl);//  JsonConvert.SerializeObject(jsonColl);
 
-                Debug.Log(serialized);
+               // Debug.Log(serialized);
                 //write string to file
                 // System.IO.File.WriteAllText(Application.dataPath+"/" + collisionLevelName, serialized);
 
