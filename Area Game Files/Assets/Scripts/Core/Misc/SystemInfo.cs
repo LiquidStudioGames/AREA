@@ -57,8 +57,8 @@ public class SystemInfo : MonoBehaviour
     {
 
         // Assigns the FPS :: Rounds from float to int
-        // This here is not completely correct, but it's quite close2
-        FPS = Mathf.RoundToInt(1f / Time.unscaledDeltaTime);
+        // This here is not completely correct, but it's quite close
+        FPS = Mathf.RoundToInt(1f / Time.deltaTime);
 
         // Assigns the ping
         Ping = 0;
