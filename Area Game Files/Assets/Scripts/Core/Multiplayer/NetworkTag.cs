@@ -101,5 +101,6 @@ public class NetworkTag : MonoBehaviour
     {
         if (!calls.ContainsKey(call.Method.Name)) throw new ArgumentException($"{call.Method.Name} is not registered, check if the method has a NetworkCall Attribute.");
         Game.Instance.NetworkScene.SendCall(this, target, (byte)calls.IndexOfKey(call.Method.Name), stream, sendtype);
+
     }
 }

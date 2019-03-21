@@ -73,9 +73,9 @@ public class BepuExample : MonoBehaviour
         return new Quaternion(q.W, q.Z, -q.Y, -q.X);
     }
 
-    Vector3 BepuToUnityVector3(BEPUutilities.Vector3 vec)
+    UnityEngine.Vector3 BepuToUnityVector3(BEPUutilities.Vector3 vec)
     {
-        return new Vector3(vec.X, vec.Y, vec.Z);
+        return new UnityEngine.Vector3(vec.X, vec.Y, vec.Z);
     }
 
     BEPUutilities.Vector3 UnityToBepuVector3(Vector3 vec)
