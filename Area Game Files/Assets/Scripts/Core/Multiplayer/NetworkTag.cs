@@ -94,12 +94,12 @@ public class NetworkTag : MonoBehaviour
     public void Call(NetworkCall call, SteamPlayer target, BitStream stream, SendType sendtype = SendType.Unreliable)
     {
         if (!calls.ContainsKey(call.Method.Name)) throw new ArgumentException($"{call.Method.Name} is not registered, check if the method has a NetworkCall Attribute.");
-        Game.Instance.NetworkScene.SendCall(this, target, (byte)calls.IndexOfKey(call.Method.Name), stream, sendtype);
+        Game.Instance?.NetworkScene.SendCall(this, target, (byte)calls.IndexOfKey(call.Method.Name), stream, sendtype);
     }
 
     public void Call(NetworkCall call, NetworkTarget target, BitStream stream, SendType sendtype = SendType.Unreliable)
     {
         if (!calls.ContainsKey(call.Method.Name)) throw new ArgumentException($"{call.Method.Name} is not registered, check if the method has a NetworkCall Attribute.");
-        Game.Instance.NetworkScene.SendCall(this, target, (byte)calls.IndexOfKey(call.Method.Name), stream, sendtype);
+        Game.Instance?.NetworkScene.SendCall(this, target, (byte)calls.IndexOfKey(call.Method.Name), stream, sendtype);
     }
 }

@@ -292,6 +292,41 @@ public partial class BitStream
         return this;
     }
 
+    public BitStream Write(ulong o, int bits = 64)
+    {
+        if (bits <= 8) return Write((byte)o, bits);
+        if (bits <= 16) return Write((ushort)o, bits);
+        if (bits <= 32) return Write((uint)o, bits);
+        if (bits > 64) throw new Exception("ULong has only 64 bits.");
+        bs.ul = o;
+
+        if (BitConverter.IsLittleEndian)
+        {
+            Write(bs.b8, bits - 56);
+            Write(bs.b7, Math.Min(bits - 48, 8));
+            Write(bs.b6, Math.Min(bits - 40, 8));
+            Write(bs.b5, Math.Min(bits - 32, 8));
+            Write(bs.b4);
+            Write(bs.b3);
+            Write(bs.b2);
+            Write(bs.b1);
+        }
+
+        else
+        {
+            Write(bs.b1);
+            Write(bs.b2);
+            Write(bs.b3);
+            Write(bs.b4);
+            Write(bs.b5, Math.Min(bits - 32, 8));
+            Write(bs.b6, Math.Min(bits - 40, 8));
+            Write(bs.b7, Math.Min(bits - 48, 8));
+            Write(bs.b8, bits - 56);
+        }
+
+        return this;
+    }
+
     public BitStream Write(bool o)
     {
         return Write((byte)(o ? 1 : 0), 1);
@@ -502,6 +537,40 @@ public partial class BitStream
         }
 
         return bs.l;
+    }
+
+    public ulong ReadULong(int bits = 64)
+    {
+        if (bits <= 8) return ReadByte(bits);
+        if (bits <= 16) return ReadUShort(bits);
+        if (bits <= 32) return ReadUInt(bits);
+        if (bits > 64) throw new Exception("ULong has only 64 bits.");
+
+        if (BitConverter.IsLittleEndian)
+        {
+            bs.b8 = ReadByte(bits - 56);
+            bs.b7 = ReadByte(Math.Min(bits - 48, 8));
+            bs.b6 = ReadByte(Math.Min(bits - 40, 8));
+            bs.b5 = ReadByte(Math.Min(bits - 32, 8));
+            bs.b4 = ReadByte();
+            bs.b3 = ReadByte();
+            bs.b2 = ReadByte();
+            bs.b1 = ReadByte();
+        }
+
+        else
+        {
+            bs.b1 = ReadByte();
+            bs.b2 = ReadByte();
+            bs.b3 = ReadByte();
+            bs.b4 = ReadByte();
+            bs.b5 = ReadByte(Math.Min(bits - 32, 8));
+            bs.b6 = ReadByte(Math.Min(bits - 40, 8));
+            bs.b7 = ReadByte(Math.Min(bits - 48, 8));
+            bs.b8 = ReadByte(bits - 56);
+        }
+
+        return bs.ul;
     }
 
     public bool ReadBool()
