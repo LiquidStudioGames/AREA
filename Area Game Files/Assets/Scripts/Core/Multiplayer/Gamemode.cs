@@ -2,7 +2,7 @@
 
 public class Gamemode : MonoBehaviour
 {
-    public GameObject playerObj;
+    public AssetObject playerAsset;
     public Transform spawn;
 
     public GamemodeData data;
@@ -20,8 +20,7 @@ public class Gamemode : MonoBehaviour
     [NetworkCall]
     private void PlayerJoin(BitStream stream, SteamPlayer sender)
     {
-        GameObject o = Instantiate(playerObj, spawn.position, spawn.rotation);
-        uint tag = Game.Instance.NetworkScene.SetTag(o, sender).ID;
+        networkTag.Instantiate(playerAsset, sender, out uint tag, spawn.position, spawn.rotation);
         networkTag.Call(SpawnPlayer, NetworkTarget.Others, new BitStream().Write(tag).Write(sender.ID), SendType.Reliable);
     }
 
@@ -30,7 +29,6 @@ public class Gamemode : MonoBehaviour
     {
         uint tag = stream.ReadUInt();
         SteamPlayer player = SteamPlayer.FromID(stream.ReadULong());
-        GameObject o = Instantiate(playerObj, spawn.position, spawn.rotation);
-        Game.Instance.NetworkScene.SetTag(o, player, tag);
+        networkTag.Instantiate(playerAsset, player, tag, spawn.position, spawn.rotation);
     }
 }

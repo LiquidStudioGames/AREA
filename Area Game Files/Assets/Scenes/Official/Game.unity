@@ -433,8 +433,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cc1c21fe62511f4b9492894795cf39b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerObj: {fileID: 7218913987245704550, guid: ae5e17918af5de24ea2230c00f0db7f4,
-    type: 3}
+  playerAsset:
+    path: Assets/Prefabs/Player.prefab
+    bundle: characters
+    asset: {fileID: 7218913987245704550, guid: ae5e17918af5de24ea2230c00f0db7f4, type: 3}
   spawn: {fileID: 1044960748}
 --- !u!4 &461833806
 Transform:

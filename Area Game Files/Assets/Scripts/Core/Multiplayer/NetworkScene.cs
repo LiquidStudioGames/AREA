@@ -20,6 +20,11 @@ public class NetworkScene
         tags = new Dictionary<uint, NetworkTag>();
     }
 
+    internal void AddSpawn(NetworkSpawn spawn)
+    {
+        spawns.Add(spawn);
+    }
+
     internal void HandleServerSpawn()
     {
         NetworkTag[] spawnTags = Object.FindObjectsOfType<NetworkTag>();
@@ -122,6 +127,19 @@ public class NetworkScene
             tag.ID = tagid;
             tag.Owner = owner;
             tags.Add(tagid, tag);
+        }
+    }
+
+    internal void RemoveTag(NetworkTag tag)
+    {
+        tags.Remove(tag.ID);
+
+        for (int i = 0; i < spawns.Count; i++)
+        {
+            if (spawns[i].tag == tag.ID)
+            {
+                spawns.RemoveAt(i--);
+            }
         }
     }
 
