@@ -9,6 +9,8 @@ public class KeyboardLayout : ScriptableObject
                    Forward = KeyCode.W,
                    Backwards = KeyCode.S,
                    StrafeLeft = KeyCode.A,
-                   StrafeRight = KeyCode.D;
+                   StrafeRight = KeyCode.D,
+                   Spray = KeyCode.T,
+                   Switch = KeyCode.Q;
 
 }
