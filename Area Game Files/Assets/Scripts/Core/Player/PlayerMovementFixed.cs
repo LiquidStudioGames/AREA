@@ -68,7 +68,14 @@ public class PlayerMovementFixed : MonoBehaviour
         {
             AirMove();
         }
-
+        if (playerVelocity.y < 0)
+        {
+            playerVelocity.y -= gravity * Time.fixedDeltaTime * downGravityMultiplier;
+        }
+        else
+        {
+            playerVelocity.y -= gravity * Time.fixedDeltaTime;
+        }
         chController.Move(playerVelocity * Time.fixedDeltaTime);
 
     }
@@ -107,14 +114,7 @@ public class PlayerMovementFixed : MonoBehaviour
         if (airControl > 0)
             AirControl(wishDir, wishSpeed2);
 
-        if (playerVelocity.y < 0)
-        {
-            playerVelocity.y -= gravity * Time.fixedDeltaTime * downGravityMultiplier;
-        }
-        else
-        {
-            playerVelocity.y -= gravity * Time.fixedDeltaTime;
-        }
+
     }
 
     /// <summary>
@@ -153,7 +153,7 @@ public class PlayerMovementFixed : MonoBehaviour
         }
 
         playerVelocity.x *= speed;
-        playerVelocity.y = zspeed; // Note this line
+       playerVelocity.y = zspeed; // Note this line
         playerVelocity.z *= speed;
     }
 
@@ -283,7 +283,14 @@ public class PlayerMovementFixed : MonoBehaviour
     /// </returns>
     private bool IsGrounded()
     {
-        return chController.isGrounded;
+        Ray sphereRay = new Ray(transform.position, -transform.up*playerHeight);
+        if (Physics.SphereCast(sphereRay, chController.radius, chController.bounds.extents.y+groundSmooth-chController.radius/2, groundCollision))
+        {
+            return true;
+        }
+        //Physics.SphereCast()
+        return false;
+
 
     }
 
