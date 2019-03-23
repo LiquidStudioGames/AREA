@@ -21,6 +21,7 @@ public class Game : MonoBehaviour
     public Settings Settings;
     public SteamClient Steam;
     public NetworkScene NetworkScene;
+    public GamemodeData GamemodeData;
 
     public GameState State;
 
@@ -102,10 +103,11 @@ public class Game : MonoBehaviour
         if (e == LobbyEvent.Created || e == LobbyEvent.Joined)
         {
             ChangeState(GameState.Game);
+            GamemodeData = new GamemodeData();
 
             // This is basically pressing 'Start Game' immediatly
             Steam.StartListen();
-            Steam.LoadLevel("GameTestScene");
+            Steam.LoadLevel("Game");
         }
     }
 }
