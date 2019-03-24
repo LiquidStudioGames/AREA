@@ -48,15 +48,13 @@ public class NetworkScene
     internal NetworkTag SetTag(GameObject obj, SteamPlayer owner)
     {
         NetworkTag tag = obj.GetComponent<NetworkTag>();
+        if (tag == null) tag = obj.GetComponentInChildren<NetworkTag>();
+        if (tag == null) return null;
 
-        if (tag != null)
-        {
-            tag.Owner = owner;
-            AddTag(tag);
-            return tag;
-        }
-
-        return null;
+        tag.Owner = owner;
+        AddTag(tag);
+        tag.EnableTag();
+        return tag;
     }
 
     private void AddTag(NetworkTag tag)
@@ -120,14 +118,14 @@ public class NetworkScene
     internal void SetTag(GameObject obj, SteamPlayer owner, uint tagid)
     {
         NetworkTag tag = obj.GetComponent<NetworkTag>();
+        if (tag == null) tag = obj.GetComponentInChildren<NetworkTag>();
+        if (tag == null) return;
 
-        if (tag != null)
-        {
-            if (tag.ID != 0) tags.Remove(tag.ID);
-            tag.ID = tagid;
-            tag.Owner = owner;
-            tags.Add(tagid, tag);
-        }
+        if (tag.ID != 0) tags.Remove(tag.ID);
+        tag.ID = tagid;
+        tag.Owner = owner;
+        tags.Add(tagid, tag);
+        tag.EnableTag();
     }
 
     internal void RemoveTag(NetworkTag tag)

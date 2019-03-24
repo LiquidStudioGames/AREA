@@ -39,9 +39,10 @@ public class NetworkTag : MonoBehaviour
     {
         calls = new SortedList<string, NetworkCall>();
 
-        foreach (Component component in GetComponents<Component>())
+        foreach (Behaviour component in GetComponents<Behaviour>())
         {
             ParseComponent(component);
+            if (Game.Instance != null) component.enabled = false;
         }
     }
 
@@ -51,7 +52,15 @@ public class NetworkTag : MonoBehaviour
         Game.Instance?.NetworkScene.RemoveTag(this);
     }
 
-    private void ParseComponent(Component component)
+    internal void EnableTag()
+    {
+        foreach (Behaviour component in GetComponents<Behaviour>())
+        {
+            component.enabled = true;
+        }
+    }
+
+    private void ParseComponent(Behaviour component)
     {
         foreach (MethodInfo info in component.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
         {
@@ -74,7 +83,7 @@ public class NetworkTag : MonoBehaviour
         }
     }
 
-    public T AddComponent<T>() where T : Component
+    public T AddComponent<T>() where T : Behaviour
     {
         T behaviour = gameObject.AddComponent<T>();
         ParseComponent(behaviour);

@@ -4,13 +4,21 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
+    public GameObject cam;
 
-    Transform playerObj; 
+    private Transform playerObj;
+    private NetworkTag networkTag;
 
     //Gets component 
-    void Awake()
+    void Start()
     {
         playerObj = GetComponentInParent<Transform>();
+        networkTag = GetComponent<NetworkTag>();
+
+        if (!networkTag.IsMine)
+        {
+            Destroy(cam);
+        }
     }
 
     // Update is called once per frame
