@@ -6,7 +6,8 @@ using UnityEngine;
 
 public abstract class AbsGun : MonoBehaviour
 {
-    public GameObject GunBulletPrefab; //Bullet that will be shot 
+    [SerializeField]
+    private GameObject GunBulletPrefab; //Bullet that will be shot 
 
 
     //Stats for any kind of weapon
