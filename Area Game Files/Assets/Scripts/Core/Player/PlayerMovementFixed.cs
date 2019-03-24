@@ -9,8 +9,6 @@ public class PlayerMovementFixed : MonoBehaviour
     [SerializeField]
     private LayerMask groundCollision;
 
-
-
     // Movement factors 
     public float gravity = 20.0f;
     [Range(0.3f, 2f)]
@@ -26,6 +24,8 @@ public class PlayerMovementFixed : MonoBehaviour
     public float sideStrafeSpeed = 1.0f;          // What the max speed to generate when side strafing
     public float jumpSpeed = 8.0f;                // The speed at which the character's up axis gains when hitting jump
     public bool holdJumpToBhop = false;           // When enabled allows player to just hold jump button to keep on bhopping perfectly.
+
+
 
     // Internals for class control
     private float playerHeight;
