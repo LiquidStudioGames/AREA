@@ -845,6 +845,7 @@ GameObject:
   - component: {fileID: 764528172}
   - component: {fileID: 764528170}
   - component: {fileID: 764528171}
+  - component: {fileID: 764528173}
   m_Layer: 2
   m_Name: Controllers
   m_TagString: Untagged
@@ -878,6 +879,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: faea1dc9358921940bd2d7e880c5b58a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cam: {fileID: 0}
 --- !u!114 &764528171
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -919,6 +921,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   KeyBindings: {fileID: 11400000, guid: 597852b3cadc5a9458011a3ff6ae67ed, type: 2}
+--- !u!114 &764528173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 764528168}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ac4cb1fd014b8541adca8f157860114, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  layerMask: 0
+  grOffset: 0.1
 --- !u!1 &1008436150
 GameObject:
   m_ObjectHideFlags: 0
