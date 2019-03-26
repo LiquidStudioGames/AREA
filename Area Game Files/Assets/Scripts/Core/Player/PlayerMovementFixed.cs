@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class PlayerMovementFixed : MonoBehaviour
 {
-
-
     [SerializeField]
     private LayerMask groundCollision;
 
@@ -39,13 +37,16 @@ public class PlayerMovementFixed : MonoBehaviour
     private Transform parentTransform;
     private float wishSpeed;
 
+    private float lastState = float.NegativeInfinity;
+    private NetworkTag networkTag;
 
     // Awake is called when object is enabled
-    private void Awake()
+    private void Start()
     {
         reader = GetComponent<IPlayerInput>();
         chController = GetComponentInParent<CharacterController>();
         playerHeight = chController.bounds.extents.y;
+        networkTag = GetComponent<NetworkTag>();
         parentTransform = GetComponentInParent<Transform>();
 
     }
@@ -78,6 +79,29 @@ public class PlayerMovementFixed : MonoBehaviour
         }
         chController.Move(playerVelocity * Time.fixedDeltaTime);
 
+        // Network part
+        networkTag.Call(NetworkMove, NetworkTarget.Others, new BitStream().Write(Time.fixedTime).Write(transform.position).Write(transform.rotation), SendType.Unreliable);
+
+    }
+
+    [NetworkCall]
+    private void NetworkMove(BitStream stream, SteamPlayer sender)
+    {
+        // Is this the actual owner sending the state?
+        if (sender == networkTag.Owner)
+        {
+            float time = stream.ReadFloat();
+            Vector3 position = stream.ReadVector3();
+            Quaternion rotation = stream.ReadQuaternion();
+
+            // Is this state outdated?
+            if (lastState < time)
+            {
+                lastState = time;
+                transform.position = position;
+                transform.rotation = rotation;
+            }
+        }
     }
 
     private void AirMove()
