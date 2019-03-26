@@ -6,9 +6,11 @@ public class CameraController : MonoBehaviour
 {
 
     Transform playerObj; 
+    
+
 
     //Gets component 
-    void Awake()
+    void Start()
     {
         playerObj = GetComponentInParent<Transform>();
     }

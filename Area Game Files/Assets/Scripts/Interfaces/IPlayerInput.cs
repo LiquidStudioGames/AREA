@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Interface used to streamline the creation of PlayerInput classes
+/// </summary>
 public interface IPlayerInput
 {
-    /// <summary>
-    /// Interface used to streamline the creation of PlayerInput classes
-    /// </summary>
+
 
 
     bool JumpingPressed { get; }
