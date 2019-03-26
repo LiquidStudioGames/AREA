@@ -381,7 +381,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: faea1dc9358921940bd2d7e880c5b58a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  invert: 0
+  mouseSensitivity: 5
   cam: {fileID: 1785134113346817762}
+  jaw: 0
+  pitch: 0
 --- !u!114 &1785134114434717905
 MonoBehaviour:
   m_ObjectHideFlags: 0

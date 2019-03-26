@@ -46,7 +46,6 @@ public class PlayerMovementFixed : MonoBehaviour
         playerHeight = chController.bounds.extents.y;
         networkTag = GetComponent<NetworkTag>();
         parentTransform = GetComponentInParent<Transform>();
-
     }
 
     // Update is called once per frame
@@ -199,6 +198,7 @@ public class PlayerMovementFixed : MonoBehaviour
 
         if (wishJump)
         {
+            Debug.Log("jump");
             playerVelocity.y = jumpSpeed;
             wishJump = false;
         }
@@ -290,6 +290,7 @@ public class PlayerMovementFixed : MonoBehaviour
 
         if (reader.JumpingPressed && !wishJump)
         {
+            reader.JumpingPressed = false;
             wishJump = true;
         }
         else
