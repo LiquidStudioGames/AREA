@@ -1,9 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlayerMovementFixed : MonoBehaviour
 {
+    private struct State
+    {
+        public float time;
+        public Vector3 position;
+    }
+
     [SerializeField]
     private LayerMask groundCollision;
 
@@ -38,12 +42,15 @@ public class PlayerMovementFixed : MonoBehaviour
     private float wishSpeed;
     private PlayerEnviromentChecker checker;
 
+    private State next;
+    private State current;
     private float lastState = float.NegativeInfinity;
     private NetworkTag networkTag;
 
     // Awake is called when object is enabled
     private void Awake()
     {
+        current = next = new State { time = Time.time, position = transform.position };
         reader = GetComponent<IPlayerInput>();
         checker = GetComponent<PlayerEnviromentChecker>();
         chController = GetComponentInParent<CharacterController>();
@@ -54,12 +61,23 @@ public class PlayerMovementFixed : MonoBehaviour
     }
 
     // Update is called once per frame
-
+    private void Update()
+    {
+        if (current.time != next.time)
+        {
+            float t = (Time.time - current.time) / (next.time - current.time);
+            transform.position = Vector3.Lerp(current.position, next.position, t);
+        }
+    }
 
     private void FixedUpdate()
     {
         /* Debug part of the code */
         Debug.DrawRay(transform.position, -transform.up * (playerHeight + groundSmooth), Color.red);
+
+        // State setup
+        transform.position = next.position;
+        current = next;
 
         // Movement part 
         QueueJump();
@@ -82,6 +100,10 @@ public class PlayerMovementFixed : MonoBehaviour
 
 
         chController.Move(playerVelocity * Time.fixedDeltaTime);
+
+        // State gather
+        next.time = Time.fixedTime + Time.fixedDeltaTime;
+        next.position = transform.position;
 
         // Network part
         //networkTag.Call(NetworkMove, NetworkTarget.Others, new BitStream().Write(Time.fixedTime).Write(transform.position).Write(transform.rotation), SendType.Unreliable);
@@ -298,21 +320,18 @@ public class PlayerMovementFixed : MonoBehaviour
     /// </summary>
     private void QueueJump()
     {
+        wishJump = false;
+
         if (holdJumpToBhop)
         {
             wishJump = reader.JumpingHeld;
-            return;
         }
 
-        if (reader.JumpingPressed && !wishJump)
+        if (reader.JumpingPressed)
         {
             wishJump = true;
+            reader.JumpingPressed = false;
         }
-        else
-        {
-            wishJump = false;
-        }
-
     }
 
 

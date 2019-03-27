@@ -13,9 +13,9 @@ public class KbPlayerInput : MonoBehaviour, IPlayerInput
 
 
     //Properties for input reading
-    public bool JumpingPressed { get; private set; }
+    public bool JumpingPressed { get; set; }
     public bool JumpingHeld { get; private set; }
-    public bool FirePressed { get; private set; }
+    public bool FirePressed { get; set; }
     public bool FireHeld { get; private set; }
     public bool Forward { get; private set; }
     public bool Backwards { get; private set; }

@@ -10,10 +10,10 @@ public interface IPlayerInput
 
 
 
-    bool JumpingPressed { get; }
+    bool JumpingPressed { get; set; }
     bool JumpingHeld { get; } //Used for bufferjumping
 
-    bool FirePressed { get; }
+    bool FirePressed { get; set; }
     bool FireHeld { get; } //Used when AutoFire is on
 
     bool Forward { get; }

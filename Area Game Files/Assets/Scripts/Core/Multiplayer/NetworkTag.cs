@@ -25,6 +25,7 @@ public class NetworkTag : MonoBehaviour
     public SteamPlayer Owner;
 
     internal SortedList<string, NetworkCall> calls;
+    private HashSet<Behaviour> behaviours;
 
     public bool IsMine
     {
@@ -37,12 +38,18 @@ public class NetworkTag : MonoBehaviour
 
     private void Awake()
     {
+        behaviours = new HashSet<Behaviour>();
         calls = new SortedList<string, NetworkCall>();
 
         foreach (Behaviour component in GetComponents<Behaviour>())
         {
             ParseComponent(component);
-            if (Game.Instance != null) component.enabled = false;
+
+            if (Game.Instance != null && component.enabled)
+            {
+                component.enabled = false;
+                behaviours.Add(component);
+            }
         }
     }
 
@@ -54,7 +61,7 @@ public class NetworkTag : MonoBehaviour
 
     internal void EnableTag()
     {
-        foreach (Behaviour component in GetComponents<Behaviour>())
+        foreach (Behaviour component in behaviours)
         {
             component.enabled = true;
         }

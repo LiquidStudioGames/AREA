@@ -333,7 +333,6 @@ GameObject:
   - component: {fileID: 1785134114434717910}
   - component: {fileID: 1785134114434717904}
   - component: {fileID: 1785134114434717905}
-  - component: {fileID: 1785134114434717911}
   - component: {fileID: 1785134114434717908}
   m_Layer: 0
   m_Name: Controllers
@@ -381,7 +380,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: faea1dc9358921940bd2d7e880c5b58a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  invert: 0
+  mouseSensitivity: 5
   cam: {fileID: 1785134113346817762}
+  jaw: 0
+  pitch: 0
 --- !u!114 &1785134114434717905
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -410,34 +413,6 @@ MonoBehaviour:
   sideStrafeSpeed: 1
   jumpSpeed: 8
   holdJumpToBhop: 1
---- !u!114 &1785134114434717911
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1785134114434717906}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4ba509fa1cb0ce045b397db8505b6836, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  groundCollision:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  gravity: 20
-  downGravityMultiplier: 1.2
-  friction: 6
-  baseSpeed: 7
-  runAcceleration: 14
-  runDeacceleration: 10
-  airAcceleration: 2
-  airDecceleration: 2
-  airControl: 0.3
-  sideStrafeAcceleration: 50
-  sideStrafeSpeed: 1
-  jumpSpeed: 8
-  holdJumpToBhop: 0
 --- !u!114 &1785134114434717908
 MonoBehaviour:
   m_ObjectHideFlags: 0
