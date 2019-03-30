@@ -20,15 +20,15 @@ public class Gamemode : MonoBehaviour
     [NetworkCall]
     private void PlayerJoin(BitStream stream, SteamPlayer sender)
     {
-        networkTag.Instantiate(playerAsset, sender, out uint tag, spawn.position, spawn.rotation);
-        networkTag.Call(SpawnPlayer, NetworkTarget.Others, new BitStream().Write(tag).Write(sender.ID), SendType.Reliable);
+        networkTag.Instantiate(playerAsset, sender, out uint[] tags, spawn.position, spawn.rotation);
+        networkTag.Call(SpawnPlayer, NetworkTarget.Others, new BitStream().Write(tags).Write(sender.ID), SendType.Reliable);
     }
 
     [NetworkCall]
     private void SpawnPlayer(BitStream stream, SteamPlayer sender)
     {
-        uint tag = stream.ReadUInt();
+        uint[] tags = stream.ReadUInts();
         SteamPlayer player = SteamPlayer.FromID(stream.ReadULong());
-        networkTag.Instantiate(playerAsset, player, tag, spawn.position, spawn.rotation);
+        networkTag.Instantiate(playerAsset, player, tags, spawn.position, spawn.rotation);
     }
 }

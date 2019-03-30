@@ -120,19 +120,19 @@ public class NetworkTag : MonoBehaviour
         Game.Instance?.NetworkScene.SendCall(this, target, (byte)calls.IndexOfKey(call.Method.Name), stream, sendtype);
     }
 
-    public GameObject Instantiate(AssetObject asset, SteamPlayer owner, out uint tag, Vector3 position, Quaternion rotation)
+    public GameObject Instantiate(AssetObject asset, SteamPlayer owner, out uint[] tags, Vector3 position, Quaternion rotation)
     {
         GameObject o = Instantiate(asset.Load<GameObject>(), position, rotation);
-        tag = Game.Instance.NetworkScene.SetTag(o, owner).ID;
-        Game.Instance.NetworkScene.AddSpawn(new NetworkSpawn { tag = tag, asset = asset, owner = owner, position = position, rotation = rotation });
+        tags = Game.Instance.NetworkScene.SetTags(o, owner);
+        Game.Instance.NetworkScene.AddSpawn(new NetworkSpawn { tags = new List<uint>(tags), asset = asset, owner = owner, position = position, rotation = rotation });
         return o;
     }
 
-    public GameObject Instantiate(AssetObject asset, SteamPlayer owner, uint tag, Vector3 position, Quaternion rotation)
+    public GameObject Instantiate(AssetObject asset, SteamPlayer owner, uint[] tags, Vector3 position, Quaternion rotation)
     {
         GameObject o = Instantiate(asset.Load<GameObject>(), position, rotation);
-        Game.Instance.NetworkScene.SetTag(o, owner, tag);
-        Game.Instance.NetworkScene.AddSpawn(new NetworkSpawn { tag = tag, asset = asset, owner = owner, position = position, rotation = rotation });
+        Game.Instance.NetworkScene.SetTags(o, owner, tags);
+        Game.Instance.NetworkScene.AddSpawn(new NetworkSpawn { tags = new List<uint>(tags), asset = asset, owner = owner, position = position, rotation = rotation });
         return o;
     }
 }

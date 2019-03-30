@@ -1,5 +1,35 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1063149505055042706
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7926636622730948655}
+  m_Layer: 0
+  m_Name: Barrel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7926636622730948655
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1063149505055042706}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0.51}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 425380506157561805}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1785134113346817762
 GameObject:
   m_ObjectHideFlags: 0
@@ -439,6 +469,7 @@ GameObject:
   - component: {fileID: 1532874195344959648}
   - component: {fileID: 3833721500604141520}
   - component: {fileID: 2940933260895114666}
+  - component: {fileID: 6148645778507853258}
   - component: {fileID: 3947304068734258329}
   m_Layer: 0
   m_Name: Gun
@@ -457,7 +488,8 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.356, y: 0.348, z: 0.841}
   m_LocalScale: {x: 0.225, y: 0.325, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 7926636622730948655}
   m_Father: {fileID: 1785134114359292134}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -519,6 +551,19 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &6148645778507853258
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5483788477834031671}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1fff0d006130ccc49b49a948c9dc8325, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ID: 0
 --- !u!114 &3947304068734258329
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -531,9 +576,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06d1dfec58a1ed047ae33324a5f80266, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GunBulletPrefab: {fileID: 0}
-  FireRate: 0
-  ReloadTime: 0
-  MaxAmmo: 0
-  isAutoFire: 0
-  CurrentAmmo: 0
+  stats:
+    AmmoPerShot: 1
+    MaxAmmo: 10
+    FireRate: 10
+    ReloadTime: 1
+    IsAutoFire: 0
+  mask:
+    serializedVersion: 2
+    m_Bits: 1
+  ammo: 0
+  period: 0
+  cooldown: 0
+  reloading: 0
+  barrel: {fileID: 7926636622730948655}

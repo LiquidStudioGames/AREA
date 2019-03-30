@@ -32,7 +32,7 @@ public class NetworkScene
         foreach (NetworkTag tag in spawnTags)
         {
             SteamPlayer owner = SteamPlayer.FromID(0);
-            SetTag(tag.gameObject, owner);
+            SetTag(tag, owner);
 
             spawns.Add(new NetworkSpawn()
             {
@@ -40,21 +40,28 @@ public class NetworkScene
                 owner = owner,
                 position = (tag.transform is RectTransform ? Vector3.zero : tag.transform.position),
                 rotation = tag.transform.rotation,
-                tag = tag.ID
+                tags = new List<uint>() { tag.ID }
             });
         }
     }
 
-    internal NetworkTag SetTag(GameObject obj, SteamPlayer owner)
+    internal uint[] SetTags(GameObject obj, SteamPlayer owner)
     {
-        NetworkTag tag = obj.GetComponent<NetworkTag>();
-        if (tag == null) tag = obj.GetComponentInChildren<NetworkTag>();
-        if (tag == null) return null;
+        NetworkTag[] tags = obj.GetComponentsInChildren<NetworkTag>();
 
+        for (int i = 0; i < tags.Length; i++)
+        {
+            SetTag(tags[i], owner);
+        }
+
+        return tags.Select(x => x.ID).ToArray();
+    }
+
+    private void SetTag(NetworkTag tag, SteamPlayer owner)
+    {
         tag.Owner = owner;
         AddTag(tag);
         tag.EnableTag();
-        return tag;
     }
 
     private void AddTag(NetworkTag tag)
@@ -77,9 +84,10 @@ public class NetworkScene
         for (int i = 0; i < array.Length; i++)
         {
             NetworkTag current = array[i];
-            NetworkSpawn spawn = spawns.Where(x => x.tag == current.ID).FirstOrDefault();
+            NetworkSpawn spawn = spawns.Where(x => x.tags.Contains(current.ID)).FirstOrDefault();
+            spawn.tags.Remove(current.ID);
             AddTag(current);
-            if (spawn != null) spawn.tag = current.ID;
+            if (spawn != null) spawn.tags.Add(current.ID);
         }
     }
     
@@ -102,7 +110,7 @@ public class NetworkScene
 
             else
             {
-                SetTag(tag.gameObject, SteamPlayer.FromID(0), s.tag);
+                SetTag(tag, SteamPlayer.FromID(0), s.tags[0]);
                 scenespawns.Remove(s);
             }
         }
@@ -111,16 +119,23 @@ public class NetworkScene
         {
             if (spawn.asset.bundle == "UnityEngine") continue;
             GameObject obj = Object.Instantiate(AssetBundleLoader.GetAssetFromBundle<GameObject>(spawn.asset), spawn.position, spawn.rotation);
-            SetTag(obj, spawn.owner, spawn.tag);
+            SetTags(obj, spawn.owner, spawn.tags.ToArray());
         }
     }
 
-    internal void SetTag(GameObject obj, SteamPlayer owner, uint tagid)
+    internal void SetTags(GameObject obj, SteamPlayer owner, uint[] tagids)
     {
-        NetworkTag tag = obj.GetComponent<NetworkTag>();
-        if (tag == null) tag = obj.GetComponentInChildren<NetworkTag>();
-        if (tag == null) return;
+        NetworkTag[] tags = obj.GetComponentsInChildren<NetworkTag>();
+        if (tags.Length != tagids.Length) throw new System.Exception("Something went wrong.");
 
+        for (int i = 0; i < tags.Length; i++)
+        {
+            SetTag(tags[i], owner, tagids[i]);
+        }
+    }
+
+    private void SetTag(NetworkTag tag, SteamPlayer owner, uint tagid)
+    {
         if (tag.ID != 0) tags.Remove(tag.ID);
         tag.ID = tagid;
         tag.Owner = owner;
@@ -134,9 +149,10 @@ public class NetworkScene
 
         for (int i = 0; i < spawns.Count; i++)
         {
-            if (spawns[i].tag == tag.ID)
+            if (spawns[i].tags.Contains(tag.ID))
             {
-                spawns.RemoveAt(i--);
+                spawns[i].tags.Remove(tag.ID);
+                if (spawns[i].tags.Count == 0) spawns.RemoveAt(i--);
             }
         }
     }
@@ -174,7 +190,7 @@ public class NetworkScene
 
 internal class NetworkSpawn : INetworkObject
 {
-    public uint tag;
+    public List<uint> tags;
     public AssetObject asset;
     public Vector3 position;
     public Quaternion rotation;
@@ -182,7 +198,7 @@ internal class NetworkSpawn : INetworkObject
 
     public void Serialize(BitStream stream)
     {
-        stream.Write(tag);
+        stream.Write(tags.ToArray());
         stream.Write(asset);
         stream.Write(position);
         stream.Write(rotation);
@@ -191,7 +207,7 @@ internal class NetworkSpawn : INetworkObject
 
     public void Deserialize(BitStream stream)
     {
-        tag = stream.ReadUInt();
+        tags = new List<uint>(stream.ReadUInts());
         asset = stream.ReadNetworkObject<AssetObject>();
         position = stream.ReadVector3();
         rotation = stream.ReadQuaternion();
