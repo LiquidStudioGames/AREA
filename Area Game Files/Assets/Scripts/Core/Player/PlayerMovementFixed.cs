@@ -12,23 +12,10 @@ public class PlayerMovementFixed : MonoBehaviour
     private LayerMask groundCollision;
 
     // ScriptableObjs
-    public MovementValues Settings;
+    [SerializeField]
+    private MovementValues MoveSettings;
 
-    // Movement factors 
-    public float gravity = 20.0f;
-    [Range(0.3f, 2f)]
-    public float downGravityMultiplier = 1.2f;    //gravity mult for falls, higher than one = weightier falls
-    public float friction = 6;                    //Ground friction
-    public float baseSpeed = 7.0f;                // Ground move speed
-    public float runAcceleration = 14.0f;         // Ground accel
-    public float runDeacceleration = 10.0f;       // Deacceleration that occurs when running on the ground
-    public float airAcceleration = 2.0f;          // Air accel
-    public float airDecceleration = 2.0f;         // Deacceleration experienced when ooposite strafing
-    public float airControl = 0.3f;               // How precise air control is
-    public float sideStrafeAcceleration = 50.0f;  // How fast acceleration occurs to get up to sideStrafeSpeed when
-    public float sideStrafeSpeed = 1.0f;          // What the max speed to generate when side strafing
-    public float jumpSpeed = 8.0f;                // The speed at which the character's up axis gains when hitting jump
-    public bool holdJumpToBhop = false;           // When enabled allows player to just hold jump button to keep on bhopping perfectly.
+    
 
 
 
@@ -95,11 +82,11 @@ public class PlayerMovementFixed : MonoBehaviour
         }
         if (playerVelocity.y < 0)
         {
-            playerVelocity.y -= gravity * Time.fixedDeltaTime * downGravityMultiplier;
+            playerVelocity.y -= MoveSettings.gravity * Time.fixedDeltaTime * MoveSettings.downGravityMultiplier;
         }
         else
         {
-            playerVelocity.y -= gravity * Time.fixedDeltaTime;
+            playerVelocity.y -= MoveSettings.gravity * Time.fixedDeltaTime;
         }
 
 
@@ -136,36 +123,36 @@ public class PlayerMovementFixed : MonoBehaviour
 
     private void AirMove()
     {
-        float wishVel = airAcceleration;
+        float wishVel = MoveSettings.airAcceleration;
         float accel;
         Vector3 wishDir;
 
         wishDir = DesireDirection();
 
         float wishSpeed = wishDir.magnitude;
-        wishSpeed *= baseSpeed;
+        wishSpeed *= MoveSettings.baseSpeed;
 
         wishDir.Normalize();
         moveDirNorm = wishDir;
 
         //start AirControl part
         if (Vector3.Dot(playerVelocity, wishDir) < 0)
-            accel = airDecceleration;
+            accel = MoveSettings.airDecceleration;
         else
-            accel = airAcceleration;
+            accel = MoveSettings.airAcceleration;
 
         float wishSpeed2 = wishSpeed;
 
         //if the player is only strafing
         if (!(reader.Forward || reader.Backwards))
         {
-            if (wishSpeed > sideStrafeSpeed) wishSpeed = sideStrafeSpeed;
+            if (wishSpeed > MoveSettings.sideStrafeSpeed) wishSpeed = MoveSettings.sideStrafeSpeed;
 
-            accel = sideStrafeAcceleration;
+            accel = MoveSettings.sideStrafeAcceleration;
         }
 
         Accelerate(wishDir, wishSpeed, accel);
-        if (airControl > 0)
+        if (MoveSettings.airControl > 0)
             AirControl(wishDir, wishSpeed2);
         
 
@@ -193,7 +180,7 @@ public class PlayerMovementFixed : MonoBehaviour
 
         dot = Vector3.Dot(playerVelocity, wishdir);
         k = 32;
-        k *= airControl * dot * dot * Time.fixedDeltaTime;
+        k *= MoveSettings.airControl * dot * dot * Time.fixedDeltaTime;
 
         // Change direction while slowing down
         if (dot > 0)
@@ -222,12 +209,12 @@ public class PlayerMovementFixed : MonoBehaviour
         moveDirNorm = DesireDirection();
         moveDirNorm.Normalize();
         wishSpeed = moveDirNorm.magnitude;
-        wishSpeed *= baseSpeed;
-        Accelerate(moveDirNorm, wishSpeed, runAcceleration);
+        wishSpeed *= MoveSettings.baseSpeed;
+        Accelerate(moveDirNorm, wishSpeed, MoveSettings.runAcceleration);
 
 
         //Resets gravity velocity if grounded
-        playerVelocity.y = -gravity * Time.fixedDeltaTime;
+        playerVelocity.y = -MoveSettings.gravity * Time.fixedDeltaTime;
 
         //This may make jumping weird on slopes
         if (checker.OnSlope)
@@ -241,7 +228,7 @@ public class PlayerMovementFixed : MonoBehaviour
 
         if (wishJump)
         {
-            playerVelocity.y = jumpSpeed;
+            playerVelocity.y = MoveSettings.jumpSpeed;
             wishJump = false;
         }
 
@@ -302,8 +289,8 @@ public class PlayerMovementFixed : MonoBehaviour
         /* Only if the player is on the ground then apply friction */
         if (IsGrounded())
         {
-            control = speed < runDeacceleration ? runDeacceleration : speed;
-            drop = control * friction * Time.fixedDeltaTime * fMultiplier;
+            control = speed < MoveSettings.runDeacceleration ? MoveSettings.runDeacceleration : speed;
+            drop = control * MoveSettings.friction * Time.fixedDeltaTime * fMultiplier;
         }
 
         newspeed = speed - drop;
@@ -326,7 +313,7 @@ public class PlayerMovementFixed : MonoBehaviour
     {
         wishJump = false;
 
-        if (holdJumpToBhop)
+        if (MoveSettings.holdJumpToBhop)
         {
             wishJump = reader.JumpingHeld;
         }
