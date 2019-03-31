@@ -16,7 +16,7 @@ public class CameraController : MonoBehaviour
     void Start()
     {
         root = transform.parent;
-        networkTag = GetComponent<NetworkTag>();
+        networkTag = GetComponent<NetworkTag>(); 
 
         if (!networkTag.IsMine)
         {
@@ -30,7 +30,7 @@ public class CameraController : MonoBehaviour
         head = cam.transform;
         root.GetComponentInChildren<AbsGun>().SetCam(head);
     }
-    
+
     void LateUpdate()
     {
         if (networkTag.IsMine)

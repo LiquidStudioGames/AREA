@@ -11,6 +11,9 @@ public class PlayerMovementFixed : MonoBehaviour
     [SerializeField]
     private LayerMask groundCollision;
 
+    // ScriptableObjs
+    public MovementValues Settings;
+
     // Movement factors 
     public float gravity = 20.0f;
     [Range(0.3f, 2f)]
@@ -27,6 +30,8 @@ public class PlayerMovementFixed : MonoBehaviour
     public float jumpSpeed = 8.0f;                // The speed at which the character's up axis gains when hitting jump
     public bool holdJumpToBhop = false;           // When enabled allows player to just hold jump button to keep on bhopping perfectly.
 
+
+
     // Internals for class control
     private float playerHeight;
     private Vector3 playerVelocity = Vector3.zero;
@@ -34,10 +39,11 @@ public class PlayerMovementFixed : MonoBehaviour
     private float groundSmooth = 0f; //Extra distance to smooth out rough terrain
     private CharacterController chController; //will be used for caracter collision
     private IPlayerInput reader;
-    private bool wishJump;
+    private bool wishJump = false;
     private Vector3 moveDirNorm;
     private Transform parentTransform;
     private float wishSpeed;
+    private PlayerEnviromentChecker checker;
 
     private State next;
     private State current;
@@ -45,10 +51,12 @@ public class PlayerMovementFixed : MonoBehaviour
     private NetworkTag networkTag;
 
     // Awake is called when object is enabled
-    private void Start()
+    private void Awake()
     {
         current = next = new State { time = Time.time, position = transform.position };
+
         reader = GetComponent<IPlayerInput>();
+        checker = GetComponent<PlayerEnviromentChecker>();
         chController = GetComponentInParent<CharacterController>();
         playerHeight = chController.bounds.extents.y;
         networkTag = GetComponent<NetworkTag>();
@@ -93,6 +101,8 @@ public class PlayerMovementFixed : MonoBehaviour
         {
             playerVelocity.y -= gravity * Time.fixedDeltaTime;
         }
+
+
         chController.Move(playerVelocity * Time.fixedDeltaTime);
 
         // State gather
@@ -100,7 +110,7 @@ public class PlayerMovementFixed : MonoBehaviour
         next.position = transform.position;
 
         // Network part
-        networkTag.Call(NetworkMove, NetworkTarget.Others, new BitStream().Write(Time.fixedTime).Write(transform.position).Write(transform.rotation), SendType.Unreliable);
+        //networkTag.Call(NetworkMove, NetworkTarget.Others, new BitStream().Write(Time.fixedTime).Write(transform.position).Write(transform.rotation), SendType.Unreliable);
 
     }
 
@@ -147,7 +157,7 @@ public class PlayerMovementFixed : MonoBehaviour
         float wishSpeed2 = wishSpeed;
 
         //if the player is only strafing
-        if (reader.Forward && reader.Backwards)
+        if (!(reader.Forward || reader.Backwards))
         {
             if (wishSpeed > sideStrafeSpeed) wishSpeed = sideStrafeSpeed;
 
@@ -157,7 +167,7 @@ public class PlayerMovementFixed : MonoBehaviour
         Accelerate(wishDir, wishSpeed, accel);
         if (airControl > 0)
             AirControl(wishDir, wishSpeed2);
-
+        
 
     }
 
@@ -218,6 +228,16 @@ public class PlayerMovementFixed : MonoBehaviour
 
         //Resets gravity velocity if grounded
         playerVelocity.y = -gravity * Time.fixedDeltaTime;
+
+        //This may make jumping weird on slopes
+        if (checker.OnSlope)
+        {
+            //this will single out what parts are perpendicular to the plane, the 
+            //the substraction will make it so only the parts paralel to the plane stay.
+            Vector3 temp = Vector3.Project(playerVelocity, checker.Hit.normal);
+            playerVelocity -= temp;
+        }
+
 
         if (wishJump)
         {
@@ -329,7 +349,6 @@ public class PlayerMovementFixed : MonoBehaviour
         {
             return true;
         }
-        //Physics.SphereCast()
         return false;
 
 
