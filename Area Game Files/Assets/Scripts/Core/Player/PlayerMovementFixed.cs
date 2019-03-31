@@ -15,10 +15,6 @@ public class PlayerMovementFixed : MonoBehaviour
     [SerializeField]
     private MovementValues MoveSettings;
 
-    
-
-
-
     // Internals for class control
     private float playerHeight;
     private Vector3 playerVelocity = Vector3.zero;

@@ -34,8 +34,10 @@ public class PlayerEnviromentChecker : MonoBehaviour
         Ray sphereRay = new Ray(transform.position, -transform.up );
         if (Physics.SphereCast(sphereRay, charCont.radius, out hit, playerHeight + grOffset - charCont.radius, layerMask))
         {
-         return true;
+            onSlope = true;
+            return true;
         }
+        onSlope = false;
         return false;
 
     }

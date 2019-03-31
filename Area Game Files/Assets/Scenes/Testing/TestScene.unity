@@ -900,20 +900,7 @@ MonoBehaviour:
   groundCollision:
     serializedVersion: 2
     m_Bits: 51
-  Settings: {fileID: 0}
-  gravity: 20
-  downGravityMultiplier: 2
-  friction: 6
-  baseSpeed: 7
-  runAcceleration: 14
-  runDeacceleration: 10
-  airAcceleration: 2
-  airDecceleration: 2
-  airControl: 0.3
-  sideStrafeAcceleration: 50
-  sideStrafeSpeed: 1
-  jumpSpeed: 8
-  holdJumpToBhop: 1
+  MoveSettings: {fileID: 11400000, guid: 1d93c55537ac3754fa57062b1108fa85, type: 2}
 --- !u!114 &764528172
 MonoBehaviour:
   m_ObjectHideFlags: 0
