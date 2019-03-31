@@ -588,7 +588,7 @@ GameObject:
   - component: {fileID: 672198172}
   - component: {fileID: 672198173}
   - component: {fileID: 672198174}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: PlayerExperimental
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -939,7 +939,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ac4cb1fd014b8541adca8f157860114, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  layerMask: 0
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 1
   grOffset: 0.1
 --- !u!114 &764528174
 MonoBehaviour:
@@ -1149,7 +1151,7 @@ GameObject:
   - component: {fileID: 1601874833}
   - component: {fileID: 1601874832}
   - component: {fileID: 1601874831}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: PlaceHolderMesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1241,7 +1243,7 @@ GameObject:
   - component: {fileID: 1824116763}
   - component: {fileID: 1824116762}
   - component: {fileID: 1824116764}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Camera
   m_TagString: Untagged
   m_Icon: {fileID: 0}

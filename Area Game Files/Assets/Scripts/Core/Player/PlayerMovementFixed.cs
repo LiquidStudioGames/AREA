@@ -182,7 +182,7 @@ public class PlayerMovementFixed : MonoBehaviour
         float dot;
         float k;
 
-        // Can't control movement if not moving forward or backward
+        // Can't control movement if not moving forward or backwards
         if (reader.Forward || reader.Backwards || Mathf.Abs(wishspeed) < 0.001)
             return;
         zspeed = playerVelocity.y;
@@ -207,7 +207,7 @@ public class PlayerMovementFixed : MonoBehaviour
         }
 
         playerVelocity.x *= speed;
-       playerVelocity.y = zspeed; // Note this line
+        playerVelocity.y = zspeed; // Note this line
         playerVelocity.z *= speed;
     }
 
@@ -300,7 +300,7 @@ public class PlayerMovementFixed : MonoBehaviour
         drop = 0.0f;
 
         /* Only if the player is on the ground then apply friction */
-        if (chController.isGrounded)
+        if (IsGrounded())
         {
             control = speed < runDeacceleration ? runDeacceleration : speed;
             drop = control * friction * Time.fixedDeltaTime * fMultiplier;
@@ -344,14 +344,7 @@ public class PlayerMovementFixed : MonoBehaviour
     /// </returns>
     private bool IsGrounded()
     {
-        Ray sphereRay = new Ray(transform.position, -transform.up*playerHeight);
-        if (Physics.SphereCast(sphereRay, chController.radius, chController.bounds.extents.y+groundSmooth-chController.radius/2, groundCollision))
-        {
-            return true;
-        }
-        return false;
-
-
+        return checker.IsGrounded;
     }
 
 }
