@@ -4,13 +4,14 @@ using UnityEngine;
 public class KeyboardLayout : ScriptableObject
 {
 
-    public KeyCode Jump = KeyCode.Space,          
+    public KeyCode Jump = KeyCode.Space,
                    Fire = KeyCode.Mouse0,
                    Forward = KeyCode.W,
                    Backwards = KeyCode.S,
                    StrafeLeft = KeyCode.A,
                    StrafeRight = KeyCode.D,
                    Spray = KeyCode.T,
+                   Reload = KeyCode.R,
                    Switch = KeyCode.Q;
 
 }

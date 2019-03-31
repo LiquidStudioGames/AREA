@@ -16,6 +16,9 @@ public abstract class AbsGun : MonoBehaviour
     public virtual bool OnCooldown => cooldown > 0f;
     public virtual bool Reloading => reloading > 0f;
 
+
+    private IPlayerInput Imput;
+
     public void SetCam(Transform cam)
     {
         this.cam = cam;
@@ -23,6 +26,7 @@ public abstract class AbsGun : MonoBehaviour
 
     private void Start()
     {
+        Imput = GetComponent<IPlayerInput>();
         ammo = stats.MaxAmmo;
         cooldown = 0f;
         reloading = 0f;
@@ -45,7 +49,7 @@ public abstract class AbsGun : MonoBehaviour
             else return;
         }
         
-        if (Input.GetKey(KeyCode.R))
+        if (Imput.Reload)
         {
             Reload();
             return;
@@ -53,10 +57,10 @@ public abstract class AbsGun : MonoBehaviour
 
         if (stats.IsAutoFire)
         {
-            if (Input.GetMouseButton(0)) Shoot();
+            if (Imput.FireHeld) Shoot();
         }
 
-        else if (Input.GetMouseButtonDown(0)) Shoot();
+        else if (Imput.FirePressed) Shoot();
     }
 
     /// <summary>

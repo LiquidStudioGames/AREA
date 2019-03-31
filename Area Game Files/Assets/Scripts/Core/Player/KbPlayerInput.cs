@@ -21,6 +21,7 @@ public class KbPlayerInput : MonoBehaviour, IPlayerInput
     public bool Backwards { get; private set; }
     public bool Left { get; private set; }
     public bool Right { get; private set; }
+    public bool Reload { get ; private set; }
 
 
 
@@ -37,6 +38,7 @@ public class KbPlayerInput : MonoBehaviour, IPlayerInput
         Backwards = Input.GetKey(KeyBindings.Backwards);
         Left = Input.GetKey(KeyBindings.StrafeLeft);
         Right = Input.GetKey(KeyBindings.StrafeRight);
+        Reload = Input.GetKey(KeyBindings.Reload);
 
     }
 

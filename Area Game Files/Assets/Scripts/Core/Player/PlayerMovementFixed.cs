@@ -93,7 +93,7 @@ public class PlayerMovementFixed : MonoBehaviour
         next.position = transform.position;
 
         // Network part
-        //networkTag.Call(NetworkMove, NetworkTarget.Others, new BitStream().Write(Time.fixedTime).Write(transform.position).Write(transform.rotation), SendType.Unreliable);
+        if(networkTag.online)networkTag.Call(NetworkMove, NetworkTarget.Others, new BitStream().Write(Time.fixedTime).Write(transform.position).Write(transform.rotation), SendType.Unreliable);
 
     }
 
