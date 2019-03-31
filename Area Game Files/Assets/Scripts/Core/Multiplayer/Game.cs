@@ -15,7 +15,7 @@ public class Game : MonoBehaviour
 {
     public static Game Instance;
 
-    public bool IsClient;
+    public bool IsClient = true;
 
     public UI UI;
     public Settings Settings;

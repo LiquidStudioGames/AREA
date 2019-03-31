@@ -11,6 +11,9 @@ public class PlayerMovementFixed : MonoBehaviour
     [SerializeField]
     private LayerMask groundCollision;
 
+    // ScriptableObjs
+    public MovementValues Settings;
+
     // Movement factors 
     public float gravity = 20.0f;
     [Range(0.3f, 2f)]
@@ -51,6 +54,7 @@ public class PlayerMovementFixed : MonoBehaviour
     private void Awake()
     {
         current = next = new State { time = Time.time, position = transform.position };
+
         reader = GetComponent<IPlayerInput>();
         checker = GetComponent<PlayerEnviromentChecker>();
         chController = GetComponentInParent<CharacterController>();

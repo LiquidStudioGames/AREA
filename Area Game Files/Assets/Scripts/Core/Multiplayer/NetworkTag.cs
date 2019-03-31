@@ -23,6 +23,7 @@ public class NetworkTag : MonoBehaviour
 {
     public uint ID;
     public SteamPlayer Owner;
+    public bool online = false;
 
     internal SortedList<string, NetworkCall> calls;
     private HashSet<Behaviour> behaviours;
@@ -31,8 +32,11 @@ public class NetworkTag : MonoBehaviour
     {
         get
         {
-            if (Game.Instance.IsClient) return Owner == Game.Instance.Steam.Player;
-            return Owner.ID == 0;
+            if (online)
+            {
+                if (Game.Instance.IsClient) return Owner == Game.Instance.Steam.Player;
+                return Owner.ID == 0;
+            } return true;
         }
     }
 
