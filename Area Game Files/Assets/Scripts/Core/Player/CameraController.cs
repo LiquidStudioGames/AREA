@@ -28,6 +28,7 @@ public class CameraController : MonoBehaviour
         }
 
         head = cam.transform;
+        root.GetComponentInChildren<AbsGun>().SetCam(head);
     }
 
     void LateUpdate()

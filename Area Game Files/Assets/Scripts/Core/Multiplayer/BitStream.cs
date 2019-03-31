@@ -233,6 +233,18 @@ public partial class BitStream
         return this;
     }
 
+    public BitStream Write(uint[] o)
+    {
+        Write((ushort)o.Length);
+
+        for (int i = 0; i < o.Length; i++)
+        {
+            Write(o[i]);
+        }
+
+        return this;
+    }
+
     public BitStream Write(float o, int bits = 32)
     {
         if (bits > 32) throw new Exception("Float has only 32 bits.");
@@ -480,6 +492,19 @@ public partial class BitStream
         }
 
         return bs.ui;
+    }
+
+    public uint[] ReadUInts()
+    {
+        ushort length = ReadUShort();
+        uint[] result = new uint[length];
+
+        for (int i = 0; i < length; i++)
+        {
+            result[i] = ReadUInt();
+        }
+
+        return result;
     }
 
     public float ReadFloat(int bits = 32)

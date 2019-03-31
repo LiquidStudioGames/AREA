@@ -1,40 +1,106 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-
+﻿using UnityEngine;
 
 public abstract class AbsGun : MonoBehaviour
 {
-    [SerializeField]
-    private GameObject GunBulletPrefab; //Bullet that will be shot 
+    public GunStats stats;
+    public LayerMask mask;
 
+    public int ammo;
+    public float period; // Cooldown time
+    public float cooldown; // Cooldown timer
+    public float reloading; // Reload timer
 
-    //Stats for any kind of weapon
-    public float FireRate;   //Unit in rounds per minute
-    public float ReloadTime; //Unit in seconds
-    public int MaxAmmo;
-    public bool isAutoFire;  //Whether holding fire button will make it fire
+    protected Transform cam;
+    protected NetworkTag networkTag;
 
-    //Internals for gun control
-    [HideInInspector] public int CurrentAmmo;
+    public virtual bool OnCooldown => cooldown > 0f;
+    public virtual bool Reloading => reloading > 0f;
 
-    /// <summary>
-    /// Checks if gun is in cool down and creates an instance of GunBullet
-    /// </summary>
-    /// <param name="cameraAngle">The angle the player is looking at in vector 3</param>
-    public virtual void Shoot (Vector3 cameraAngle)
+    public void SetCam(Transform cam)
     {
-        CurrentAmmo--;
+        this.cam = cam;
     }
 
+    private void Start()
+    {
+        ammo = stats.MaxAmmo;
+        cooldown = 0f;
+        reloading = 0f;
+        networkTag = GetComponent<NetworkTag>();
+    }
 
-    // Start is called before the first frame update
-    public virtual void Start () { }
+    protected virtual void Update ()
+    {
+        if (OnCooldown) cooldown -= Time.deltaTime;
 
-    // Update is called once per frame
-    public virtual void Update () { }
+        if (Reloading)
+        {
+            reloading -= Time.deltaTime;
+
+            if (!Reloading)
+            {
+                ammo = stats.MaxAmmo;
+            }
+
+            else return;
+        }
+        
+        if (Input.GetKey(KeyCode.R))
+        {
+            Reload();
+            return;
+        }
+
+        if (stats.IsAutoFire)
+        {
+            if (Input.GetMouseButton(0)) Shoot();
+        }
+
+        else if (Input.GetMouseButtonDown(0)) Shoot();
+    }
+
+    /// <summary>
+    /// Checks if gun is in cool down and fires
+    /// </summary>
+    public virtual void Shoot()
+    {
+        if (cooldown <= 0f && ammo > 0)
+        {
+            period = 1f / stats.FireRate;
+            ammo -= stats.AmmoPerShot;
+            cooldown = period;
+
+            Fire();
+        }
+    }
+
+    /// <summary>
+    /// Actual firing of the gun
+    /// </summary>
+    public virtual void Fire()
+    {
+        Debug.Log("Fire");
+    }
+
+    /// <summary>
+    /// Starts the timer to reload
+    /// </summary>
+    public virtual void Reload()
+    {
+        reloading = stats.ReloadTime;
+    }
 }
 
+// Extendable class with inheritance
+[System.Serializable]
+public class GunStats
+{
+    public int AmmoPerShot = 1;
+    public int MaxAmmo = 10;
+    public float FireRate = 10f;   // In rounds per second
+    public float ReloadTime = 1f; // In seconds
+    public bool IsAutoFire = false;
+}
 
-
+// [SerializeField] This would be usefull for every projectilebased gun. Not every gun though.
+// protected GameObject GunBulletPrefab; //Bullet that will be shot 
