@@ -19,7 +19,7 @@ public class PlayerEnviromentChecker : MonoBehaviour
     private bool onSlope; //Might not be used 
     private float playerHeight;
     [SerializeField]
-    private int layerMask;
+    private LayerMask layerMask;
     [SerializeField]
     private float grOffset = 0.1f;
 
@@ -31,17 +31,15 @@ public class PlayerEnviromentChecker : MonoBehaviour
 
     private bool GroundCheck()
     {
-        bool v = Physics.Raycast(playerPos.position, -playerPos.up, out hit, playerHeight+grOffset, layerMask);
-
-        if (v)
+        Ray sphereRay = new Ray(transform.position, -transform.up );
+        if (Physics.SphereCast(sphereRay, charCont.radius, out hit, playerHeight + grOffset - charCont.radius, layerMask))
         {
-            if (hit.normal != transform.up)
-                onSlope = true;
-
+            onSlope = true;
             return true;
         }
+        onSlope = false;
         return false;
-      
+
     }
 
     private void Start()
@@ -50,6 +48,7 @@ public class PlayerEnviromentChecker : MonoBehaviour
         playerPos = GetComponentInParent<Transform>();
         playerHeight = charCont.bounds.extents.y;
     }
-    private void FixedUpdate() { GroundCheck(); }
+
+    private void FixedUpdate() { isGrounded = GroundCheck(); }
 
 }
