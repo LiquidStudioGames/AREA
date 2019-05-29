@@ -1,5 +1,5 @@
 <p align = 'center'>
-  <img src = 'https://github.com/Dmunch04/fast-paced-fps--Area-/blob/master/Ressouces/AREA%20Logo.png?raw=true' style = 'width: 105px; height: 51,5x;'>
+  <img src = 'https://raw.githubusercontent.com/Dmunch04/AREA/master/Ressources/AREA%20Logo.png' style = 'width: 105px; height: 51,5x;'>
 </p>
 
 <br>
