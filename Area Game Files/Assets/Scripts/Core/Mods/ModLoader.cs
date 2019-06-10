@@ -1,15 +1,9 @@
-﻿using System.Reflection;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-
-// 2 Ways
-// 1. Always have an assetbundle which main asset is a prefab that holds all mod information (which dll files and assetbundles to load)
-// 2. Always have a dll with a class that extends from IMod which holds all mod information (which dll files and assetbundles to load)
 
 public class Mod
 {
     public string Name { get; set; }
-    public Assembly Assembly { get; set; }
 }
 
 public class ModLoader
@@ -25,29 +19,21 @@ public class ModLoader
     {
         mods = new Dictionary<string, Mod>();
 
-        foreach (string dir in Directory.GetDirectories(path))
+        foreach (string mod in Directory.GetFiles(path))
         {
-            LoadMod(dir);
+            LoadMod(mod);
         }
     }
 
-    private void LoadMod(string directory)
+    private void LoadMod(string mod)
     {
-        Mod mod = new Mod { Name = Path.GetDirectoryName(directory) };
+        // Check zip
+        // Unzip file
+        // Load zip.json
 
-        foreach (string file in Directory.GetFiles(directory))
-        {
-            switch (Path.GetExtension(file))
-            {
-                case "assetbundle":
-                    break;
-
-                case "dll":
-                    mod.Assembly = Assembly.LoadFile(file);
-                    break;
-            }
-        }
-
-        mods.Add(mod.Name, mod);
+        // Following steps should happen when you actually use the mod, 
+        // Could be loaded at start aswell since we can't unload assemblies
+        // Load assemblies
+        // Load assetbundles
     }
 }

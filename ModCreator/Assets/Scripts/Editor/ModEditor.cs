@@ -19,6 +19,13 @@ public class Mod
 
 public class ModEditor : EditorWindow
 {
+    // Add dlls here that should be excluded from exports
+    public static string[] exceptions = new string[]
+    {
+        "Area.Shared.dll",
+        "ModEditor.dll"
+    };
+
     public string mod = "New Mod";
     public string path = "Mod/";
     public bool customScripts = true;
@@ -94,11 +101,27 @@ public class ModEditor : EditorWindow
         Directory.CreateDirectory(path + "Assemblies");
         UnityEditor.Compilation.Assembly[] playerAssemblies = CompilationPipeline.GetAssemblies(AssembliesType.Player);
 
+        HashSet<string> assemblies = new HashSet<string>();
+
         foreach (var assembly in playerAssemblies)
         {
-            string a = assembly.outputPath;
-            string b = Path.GetFileName(a);
-            if (File.Exists(a)) File.Copy(a, path + "Assemblies/" + b);
+            foreach (string ass in assembly.compiledAssemblyReferences)
+            {
+                if (!Path.IsPathRooted(ass) && !assemblies.Contains(ass))
+                    assemblies.Add(ass);
+            }
+
+            if (!assemblies.Contains(assembly.outputPath))
+                assemblies.Add(assembly.outputPath);
+        }
+
+        foreach (string assembly in assemblies)
+        {
+            if (!exceptions.Contains(Path.GetFileName(assembly)))
+            {
+                string b = Path.GetFileName(assembly);
+                if (File.Exists(assembly)) File.Copy(assembly, path + "Assemblies/" + b);
+            }
         }
     }
 
@@ -110,10 +133,7 @@ public class ModEditor : EditorWindow
             string bundle = AssetImporter.GetAtPath(assetPath).assetBundleName;
             string strippedAssetPath = assetPath.Replace("Assets/", "Assets/Converted/");
 
-            if (string.IsNullOrEmpty(bundle))
-            {
-                continue;
-            }
+            if (string.IsNullOrEmpty(bundle)) continue;
 
             switch (Path.GetExtension(strippedAssetPath))
             {
@@ -137,8 +157,7 @@ public class ModEditor : EditorWindow
                     AssetImporter.GetAtPath(strippedAssetPath).assetBundleName = "stripped_" + bundle;
                     break;
 
-                default:
-                    continue;
+                default: continue;
             }
 
         }
@@ -243,11 +262,7 @@ public class ModEditor : EditorWindow
         {
             var assetPath = AssetDatabase.GUIDToAssetPath(o);
             var importer = AssetImporter.GetAtPath(assetPath);
-
-            if (importer == null)
-            {
-                continue;
-            }
+            if (importer == null) continue;
 
             // Get asset bundle name & variant
             var assetBundleName = importer.assetBundleName;
@@ -255,11 +270,7 @@ public class ModEditor : EditorWindow
             var assetBundleFullName = string.IsNullOrEmpty(assetBundleVariant) ? assetBundleName : assetBundleName + "." + assetBundleVariant;
 
             // Only process assetBundleFullName once. No need to add it again.
-            if (processedBundles.Contains(assetBundleFullName))
-            {
-                continue;
-            }
-
+            if (processedBundles.Contains(assetBundleFullName)) continue;
             processedBundles.Add(assetBundleFullName);
 
             AssetBundleBuild build = new AssetBundleBuild
