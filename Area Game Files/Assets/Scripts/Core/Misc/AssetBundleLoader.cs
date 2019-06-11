@@ -60,6 +60,7 @@ public static class AssetBundleLoader
     public static Dictionary<Tuple<string, string>, UnityEngine.Object> cache = new Dictionary<Tuple<string, string>, UnityEngine.Object>();
 #if UNITY_EDITOR
 
+    public static void LoadExternalAssetBundle(string bundle) { }
     public static void LoadAssetBundle(string bundle) { }
     private static void LoadDependencies(string bundle) { }
     private static void UnloadDependencies(string bundle, bool keepObjects) { }
@@ -80,11 +81,6 @@ public static class AssetBundleLoader
             return null;
         }
 
-        if (!Game.Instance.IsClient)
-        {
-            asset.path = asset.path.Replace("Assets/", "Assets/Stripped_Assets/");
-        }
-
         Tuple<string, string> key = Tuple.Create(asset.bundle, asset.path);
 
         if (!cache.ContainsKey(key))
@@ -100,38 +96,26 @@ public static class AssetBundleLoader
         foreach (Tuple<string, string> key in cache.Keys.Where(x => x.Item1 == bundle))
             cache.Remove(key);
     }
-
 #else
-    private static AssetBundleManifest manifest = null;
+
+    private static Dictionary<string, AssetBundleManifest> manifests = new Dictionary<string, AssetBundleManifest>();
     private static Dictionary<string, AssetBundle> assetbundles = new Dictionary<string, AssetBundle>();
-
-    public static void LoadAssetBundle(string bundle)
+    
+    public static void LoadAssetBundle(string bundle, string mod = "Area")
     {
-        string path = Application.dataPath + "/AssetBundles/" + bundle.ToLower();
+        string path;
 
-        if (!Game.Instance.IsClient)
-        {
-            if (!bundle.Contains("stripped_")) bundle = "stripped_" + bundle;
-            path = Application.dataPath + "/Stripped_AssetBundles/" + bundle.ToLower();
-        }
+        if (mod == "Area") path = Application.dataPath + "/AssetBundles/" + bundle.ToLower();
+        else path = $"Mods/Temp/{mod}/AssetBundles/" + bundle.ToLower();
 
         if (assetbundles.ContainsKey(bundle)) return;
         AssetBundle b = AssetBundle.LoadFromFile(path);
         assetbundles.Add(bundle, b);
-        LoadDependencies(b.name);
+        LoadDependencies(b.name, mod);
     }
 
     public static T GetAssetFromBundle<T>(AssetObject asset) where T : UnityEngine.Object
     {
-        if (!Game.Instance.IsClient)
-        {
-            string ex = System.IO.Path.GetExtension(asset.path);
-            if (ex != ".prefab" && ex != ".asset") return null;
-
-            if (!asset.bundle.Contains("stripped_")) asset.bundle = "stripped_" + asset.bundle;
-            asset.path = asset.path.Replace("Assets/", "Assets/Stripped_Assets/");
-        }
-
         if (!assetbundles.ContainsKey(asset.bundle)) LoadAssetBundle(asset.bundle);
         Tuple<string, string> key = Tuple.Create(asset.bundle, asset.path);
 
@@ -148,13 +132,8 @@ public static class AssetBundleLoader
         return cache[key] as T;
     }
 
-    public static void DisposeAssetBundle(string bundle, bool keepObjects = true, bool unloadDependencies = true)
+    public static void DisposeAssetBundle(string bundle, string mod = "Area", bool keepObjects = true, bool unloadDependencies = true)
     {
-        if (!Game.Instance.IsClient)
-        {
-            if (!bundle.Contains("stripped_")) bundle = "stripped_" + bundle;
-        }
-
         if (assetbundles.ContainsKey(bundle))
         {
             assetbundles[bundle].Unload(!keepObjects);
@@ -165,51 +144,46 @@ public static class AssetBundleLoader
 
             if (unloadDependencies)
             {
-                UnloadDependencies(bundle, keepObjects);
+                UnloadDependencies(bundle, mod, keepObjects);
             }
         }
     }
 
-    private static void LoadDependencies(string bundle)
+    private static void LoadDependencies(string bundle, string mod)
     {
-        if (manifest == null)
+        if (!manifests.ContainsKey(mod))
         {
-            string assetBundlesPath = "/AssetBundles/AssetBundles";
-
-            if (!Game.Instance.IsClient)
-            {
-                assetBundlesPath = "/Stripped_AssetBundles/Stripped_AssetBundles";
-            }
-
-            manifest = AssetBundle.LoadFromFile(Application.dataPath + assetBundlesPath).LoadAsset<AssetBundleManifest>("AssetBundleManifest");
-            if (manifest == null) throw new NullReferenceException("Assetbundlemanifest is not found. {" + assetBundlesPath + "}");
+            LoadManifest(mod);
         }
 
-        foreach (string d in manifest.GetAllDependencies(bundle))
+        foreach (string d in manifests[mod].GetAllDependencies(bundle))
         {
-            if (!assetbundles.ContainsKey(d)) LoadAssetBundle(d);
+            if (!assetbundles.ContainsKey(d)) LoadAssetBundle(d, mod);
         }
     }
 
-    private static void UnloadDependencies(string bundle, bool keepObjects)
+    private static void UnloadDependencies(string bundle, string mod, bool keepObjects)
     {
-        if (manifest == null)
+        if (!manifests.ContainsKey(mod))
         {
-            string assetBundlesPath = "/AssetBundles/AssetBundles";
-
-            if (!Game.Instance.IsClient)
-            {
-                assetBundlesPath = "/Stripped_AssetBundles/Stripped_AssetBundles";
-            }
-
-            manifest = AssetBundle.LoadFromFile(Application.dataPath + assetBundlesPath).LoadAsset<AssetBundleManifest>("AssetBundleManifest");
-            if (manifest == null) throw new NullReferenceException("Assetbundlemanifest is not found. {" + assetBundlesPath + "}");
+            LoadManifest(mod);
         }
 
-        foreach (string d in manifest.GetAllDependencies(bundle))
+        foreach (string d in manifests[mod].GetAllDependencies(bundle))
         {
-            DisposeAssetBundle(d, keepObjects);
+            DisposeAssetBundle(d, mod, keepObjects);
         }
+    }
+
+    private static void LoadManifest(string mod)
+    {
+        string path;
+        if (mod == "Area") path = Application.dataPath + "/AssetBundles/AssetBundles";
+        else path = $"Mods/Temp/{mod}/AssetBundles/AssetBundles";
+
+        var manifest = AssetBundle.LoadFromFile(path).LoadAsset<AssetBundleManifest>("AssetBundleManifest");
+        if (manifest == null) throw new NullReferenceException("Assetbundlemanifest is not found. {" + path + "}");
+        manifests.Add(mod, manifest);
     }
 #endif
 }

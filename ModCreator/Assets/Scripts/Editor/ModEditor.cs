@@ -15,6 +15,7 @@ using UnityEngine.SceneManagement;
 public class Mod
 {
     public string Name { get; set; }
+    public List<string> Assemblies { get; set; }
 }
 
 public class ModEditor : EditorWindow
@@ -54,10 +55,11 @@ public class ModEditor : EditorWindow
     {
         if (Directory.Exists(path)) Directory.Delete(path, true);
         Directory.CreateDirectory(path);
+        Mod m = new Mod { Name = mod, Assemblies = new List<string>() };
 
         if (customScripts)
         {
-            BuildWithScripts();
+            BuildWithScripts(m);
         }
 
         else
@@ -69,17 +71,17 @@ public class ModEditor : EditorWindow
         }
 
         Debug.Log("Zipping");
-        File.WriteAllText(path + mod + ".json", JsonConvert.SerializeObject(new Mod { Name = mod }));
+        File.WriteAllText(path + mod + ".json", JsonConvert.SerializeObject(m));
         
         using (ZipFile zip = new ZipFile())
         {
             zip.AddDirectory(path);
-            zip.Comment = "This zip was created at " + System.DateTime.Now.ToString("G");
+            zip.Comment = "This zip was created at " + DateTime.Now.ToString("G");
             zip.Save(path + mod + ".zip");
         }
     }
 
-    public void BuildWithScripts()
+    public void BuildWithScripts(Mod mod)
     {
         if (Directory.Exists("Assets/Converted")) Directory.Delete("Assets/Converted", true);
         Directory.CreateDirectory("Assets/Converted");
@@ -101,7 +103,7 @@ public class ModEditor : EditorWindow
         Directory.CreateDirectory(path + "Assemblies");
         UnityEditor.Compilation.Assembly[] playerAssemblies = CompilationPipeline.GetAssemblies(AssembliesType.Player);
 
-        HashSet<string> assemblies = new HashSet<string>();
+        List<string> assemblies = new List<string>();
 
         foreach (var assembly in playerAssemblies)
         {
@@ -120,7 +122,9 @@ public class ModEditor : EditorWindow
             if (!exceptions.Contains(Path.GetFileName(assembly)))
             {
                 string b = Path.GetFileName(assembly);
-                if (File.Exists(assembly)) File.Copy(assembly, path + "Assemblies/" + b);
+                string result = path + "Assemblies/" + b;
+                mod.Assemblies.Add("Assemblies/" + b);
+                if (File.Exists(assembly)) File.Copy(assembly, result);
             }
         }
     }
